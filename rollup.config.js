@@ -1,6 +1,5 @@
 const resolve = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
-const json = require("@rollup/plugin-json");
 const { terser } = require("rollup-plugin-terser");
 
 
@@ -16,12 +15,11 @@ module.exports = config.map(([format, minify]) => ({
   input: "lib/index.js",
   output: {
     format: format,
-    file: `dist/json-schema-${format}${minify ? ".min" : ""}.js`,
+    file: `dist/json-schema-core-${format}${minify ? ".min" : ""}.js`,
     name: "JsonSchema",
     sourcemap: true
   },
   plugins: [
-    json(),
     resolve({
       browser: true
     }),

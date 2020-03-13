@@ -1,7 +1,7 @@
 {
-  "name": "jschema",
+  "name": "@hyperjump/json-schema-core",
   "version": "0.1.0",
-  "description": "A JSON Schema Validator",
+  "description": "A framework for building JSON Schema validators",
   "main": "lib/index.js",
   "browser": {
     "./lib/fetch.js": "./lib/fetch.browser.js"
@@ -13,23 +13,20 @@
     "build": "rollup --config rollup.config.js",
     "prepublishOnly": "npm run build"
   },
-  "repository": "github:jdesrosiers/json-schema",
+  "repository": "github:jdesrosiers/json-schema-core",
   "keywords": [
     "JSON Schema",
-    "draft 2019-09",
     "vocabulary"
   ],
   "author": "Jason Desrosiers <jdesrosi@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",
-    "@rollup/plugin-json": "^4.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "chai": "^4.2.0",
     "eslint": "^4.19.1",
     "eslint-import-resolver-node": "^0.3.2",
     "eslint-plugin-import": "^2.19.1",
-    "json-schema-test-suite": "github:json-schema-org/JSON-Schema-Test-Suite",
     "mocha": "^5.2.0",
     "nock": "^9.6.1",
     "rollup": "^2.0.3",
@@ -38,8 +35,7 @@
   "dependencies": {
     "@hyperjump/json-pointer": "^0.6.0",
     "@hyperjump/pact": "^0.1.0",
-    "fastest-stable-stringify": "^2.0.2",
-    "make-fetch-happen": "^7.1.1",
-    "node-fetch-npm": "^2.0.2"
+    "make-fetch-happen": "^8.0.4",
+    "url-resolve-browser": "^1.1.0"
   }
 }
