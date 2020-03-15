@@ -16,7 +16,7 @@ module.exports = config.map(([format, minify]) => ({
   output: {
     format: format,
     file: `dist/json-schema-core-${format}${minify ? ".min" : ""}.js`,
-    name: "JsonSchema",
+    name: "JSC",
     sourcemap: true
   },
   plugins: [
