@@ -1,7 +1,7 @@
 {
   "name": "@hyperjump/json-schema-core",
   "version": "0.1.0",
-  "description": "A framework for building JSON Schema validators",
+  "description": "A framework for building JSON Schema tools",
   "main": "lib/index.js",
   "browser": {
     "./lib/fetch.js": "./lib/fetch.browser.js"
@@ -16,7 +16,11 @@
   "repository": "github:jdesrosiers/json-schema-core",
   "keywords": [
     "JSON Schema",
-    "vocabulary"
+    "vocabulary",
+    "$ref",
+    "$recursiveRef",
+    "$recursiveAnchor",
+    "$id"
   ],
   "author": "Jason Desrosiers <jdesrosi@gmail.com>",
   "license": "MIT",
