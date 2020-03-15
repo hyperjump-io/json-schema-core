@@ -316,6 +316,49 @@ const isString = await JsonSchema.validate(schema); // Error: {
 // }
 ```
 
+## PubSub
+JSC emits events that you can subscribe to and work with however your
+application needs. For now, the only event is the `"result"` event that emits
+output units every time a keyword is validated. Internally, JSC uses these
+events to build standard output formats. Other events can be added when
+use-cases are identified for them.
+
+```javascript
+const PubSub = require("pubsub-js");
+const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+
+
+Schema.add({
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://example.com/schemas/string",
+  "type": "string"
+});
+const schema = await Schema.get("http://example.com/schemas/string");
+const isString = await JsonSchema.validate(schema);
+
+const results = [];
+const subscriptionToken = PubSub.subscribe("result", (message, result) => {
+  results.push(result);
+});
+isString(42);
+PubSub.unsubscribe(subscriptionToken);
+results; // => [
+//   {
+//     "keyword": "https://json-schema.org/draft/2019-09/schema",
+//     "absoluteKeywordLocation": "http://example.com/schemas/string#",
+//     "instanceLocation": "#",
+//     "valid": false
+//   },
+//   {
+//     "keyword": "https://json-schema.org/draft/2019-09/schema#type",
+//     "absoluteKeywordLocation": "http://example.com/schemas/string#/type",
+//     "instanceLocation": "#",
+//     "valid": false
+//   }
+// ]
+
+```
+
 ## Customize
 JSC uses a micro-kernel architecture, so it's highly customizable.  Everything
 is a plugin, even the validation logic is a plugin. So, in theory, you can use
