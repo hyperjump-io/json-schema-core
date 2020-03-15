@@ -204,41 +204,41 @@ Schema.add(schemaJSON); // Error: Couldn't determine schema version
 const schema = Schema.get("http://example.com/schemas/string"); // Error: Couldn't determine schema version
 ```
 
-## Json
-A JSON Document (JDoc) is like a Schema Document (SDoc) except with much more
-limited functionality.
+## Instance
+An Instance Document (IDoc) is like a Schema Document (SDoc) except with much
+more limited functionality.
 
-* **Json.cons**: (json: any) => JDoc
+* **Instance.cons**: (instance: any) => IDoc
 
-    Construct a JDoc from a value.
-* **Json.get**: (url: URI, contextDoc: JDoc) => JDoc
+    Construct a IDoc from a value.
+* **Instance.get**: (url: URI, contextDoc: IDoc) => IDoc
 
-    Apply a same-resource reference to a JDoc.
-* **Json.uri**: (doc: JDoc) => URI
+    Apply a same-resource reference to a IDoc.
+* **Instance.uri**: (doc: IDoc) => URI
 
     Returns a URI including the id and JSON Pointer that represents a value
     within the instance.
-* **Json.value**: (doc: JDoc) => any
+* **Instance.value**: (doc: IDoc) => any
 
     The portion of the instance that the document's JSON Pointer points to.
-* **Json.step**: (key: string, doc: JDoc) => JDoc
+* **Instance.step**: (key: string, doc: IDoc) => IDoc
 
-    Similar to `schema[key]`, but returns a JDoc.
-* **Json.entries**: (doc: JDoc) => [key, JDoc]
+    Similar to `schema[key]`, but returns a IDoc.
+* **Instance.entries**: (doc: IDoc) => [key, IDoc]
 
-    Similar to `Object.entries`, but returns JDocs for values.
-* **Json.map**: (fn: (item: JDoc, index: integer) => T, doc: JDoc) => [T]
+    Similar to `Object.entries`, but returns IDocs for values.
+* **Instance.map**: (fn: (item: IDoc, index: integer) => T, doc: IDoc) => [T]
 
-    A `map` function for a JDoc whose value is an array.
-* **Json.reduce**: (fn: (accumulator: T, item: JDoc, index: integer) => T, initial: T, doc: JDoc) => T
+    A `map` function for a IDoc whose value is an array.
+* **Instance.reduce**: (fn: (accumulator: T, item: IDoc, index: integer) => T, initial: T, doc: IDoc) => T
 
-    A `reduce` function for a JDoc whose value is an array.
-* **Json.every**: (fn: (doc: JDoc, index: integer) => boolean, doc: JDoc) => boolean
+    A `reduce` function for a IDoc whose value is an array.
+* **Instance.every**: (fn: (doc: IDoc, index: integer) => boolean, doc: IDoc) => boolean
 
-    An `every` function for a JDoc whose value is an array.
-* **Json.some**: (fn: (doc: JDoc, index: integer) => boolean, doc: JDoc) => boolean
+    An `every` function for a IDoc whose value is an array.
+* **Instance.some**: (fn: (doc: IDoc, index: integer) => boolean, doc: IDoc) => boolean
 
-    A `some` function for a JDoc whose value is an array.
+    A `some` function for a IDoc whose value is an array.
 
 ## Output
 JSC supports all of the standard output formats specified for JSON Schema
@@ -428,10 +428,10 @@ const cond = {
     return Promise.all(subSchemas);
   },
 
-  interpret: (cond, json, ast) => {
-    return JsonSchema.interpretSchema(cond[0], json, ast)
-      ? (cond[1] ? Core.interpretSchema(cond[1], json, ast) : true)
-      : (cond[2] ? Core.interpretSchema(cond[2], json, ast) : true);
+  interpret: (cond, instance, ast) => {
+    return JsonSchema.interpretSchema(cond[0], instance, ast)
+      ? (cond[1] ? Core.interpretSchema(cond[1], instance, ast) : true)
+      : (cond[2] ? Core.interpretSchema(cond[2], instance, ast) : true);
   }
 };
 
