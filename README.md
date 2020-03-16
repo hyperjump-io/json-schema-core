@@ -356,18 +356,101 @@ results; // => [
 //     "valid": false
 //   }
 // ]
-
 ```
 
 ## Customize
-JSC uses a micro-kernel architecture, so it's highly customizable.  Everything
+JSC uses a micro-kernel architecture, so it's highly customizable. Everything
 is a plugin, even the validation logic is a plugin. So, in theory, you can use
 JSC as a framework for building other types of JSON Schema based tools such as
 code generators or form generators.
 
-In addition to this documentation you should be able to look at the code to see
-an example of how to add your custom plugins because it's all implemented the
-same way.
+In addition to this documentation you should be able to look at the
+[JSV](https://github.com/jdesrosiers/json-schema) code to see an example of how
+to add your custom plugins because it's all implemented the same way.
+
+### References
+The `$ref` keyword has changed a couple times over the last several drafts. JSC
+allows you to configure which version(s) of `$ref`s you want to support. There
+are four types of references.
+
+* **JSON Reference**: *(draft-04)* References are defined in a separate spec
+  from JSON Schema. The JSON Schema spec only constrains `$ref` in how URIs are
+  resolved with respect to `id`.
+
+* **JSON Schema Reference**: *(draft-06/7)* The JSON Schema spec absorbed the
+  JSON Reference spec and further constrained `$ref` to only be allowed where
+  schemas are allowed. JSC doesn't support this type of reference because I
+  haven't figured out how to do it a keyword agnostic way. You can use JSON
+  References instead and it will just be a little more lenient about where
+  references are allowed.
+
+* **Keyword Reference**: *(draft-2019-09)* A reference was changed from being an
+  object with a `$ref` property to the value of a `$ref` keyword. This allowed
+  `$ref` to behave more like a keyword.
+
+* **Keyword Recursive Reference**: *(draft-2019-09)* Along with
+  `$recursiveAnchor`, this new type of reference was added to the spec to make
+  it easier to write custom meta-schemas.
+
+References can be configured by `$schema` identifier. When you create a custom
+meta-schema, you will need to configure which types of references your schema
+version supports. You do this with `Schema.setConfig`.
+
+```javascript
+const { Schema } = require("@hyperjump/json-schema-core");
+
+
+// Configure draft-2019-09 style references
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "keywordReference", true);
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "keywordRecursiveReference", true);
+
+// Configure draft-04/6/7 style references
+Schema.setConfig("http://json-schema.org/draft-04/schema", "jsonReference", true);
+```
+
+### Identifiers
+The `$id` keyword has seen it's fair share of churn as well. Although the spec
+around this keyword was rewritten an clarified many times, the vast majority of
+changes have simply been name changes. JSC allows you to configure which version
+you want to support.
+
+* **id**: *(draft-04)* A base URI used to resolve reference URIs.
+
+* **$id**: *(draft-06/07)* Same as `id`, just a different name.
+
+* **$id**: *(draft-2019-09)* Same as `$id` except with same-document reference
+  support split out into `$anchor`.
+
+* **$anchor**: *(draft-2019-09)* Same as same-document reference draft 2019-09
+  `$id`s.
+
+In draft-2019-09, `$id` was redefined from being a resolution scope modifier to
+being an inlined reference. This means that JSON Pointers can not cross into
+schemas with `$id`s. So far, JSC only supports these bounded `$id`s. If I come
+up with a way to relax this constraint for old draft implementations, I will,
+but since there is no sensible reason to want such a thing, it's a low priority.
+
+In JSON Schema, properties called `$id` are only considered identifiers if they
+appear in a schema. JSC is keyword agnostic, so it doesn't know what is a schema
+and what isn't. Therefore, an `$id` might be treated as an identifier in places
+it's not expected to. This is unlikely, but not impossible.
+
+```javascript
+const { Schema } = require("@hyperjump/json-schema-core");
+
+
+// Configure draft-2019-09 style identifiers
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "idToken", "$id");
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "anchorToken", "$anchor");
+
+// Configure draft-06/7 style references
+Schema.setConfig("http://json-schema.org/draft-04/schema", "idToken", "$id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "anchorToken", "$id");
+
+// Configure draft-04 style references
+Schema.setConfig("http://json-schema.org/draft-04/schema", "idToken", "id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "anchorToken", "id");
+```
 
 ### Custom Meta-Schemas
 Let's say you want to use a custom meta-schema that does stricter validation
@@ -375,7 +458,7 @@ than the standard meta-schema. Once you have your custom meta-schema ready, it's
 just a couple lines of code to start using it.
 
 ```javascript
-const { JsonSchema } = require("@hyperjump/json-schema-core");
+const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
 
 
 // Optional: Load your meta-schema. If you don't do this, JSC will fetch it
@@ -384,10 +467,15 @@ const myCustomMetaSchema = require("./my-custom-meta-schema.schema.json");
 Schema.add(myCustomMetaSchema);
 
 // Choose a unique URI for your meta-schema
-// We want validation to function exactly the same way, so we can use the
-// standard `validate` keyword.
+schemaVersion = "http://example.com/draft/2019-09-strict/schema";
+
+// We want validation to function exactly the same way, so we can use the standard `validate` keyword.
 const validate = require("jschema/lib/keywords/validate");
-JsonSchema.addkeyword("http://example.com/draft/2019-09-strict/schema#validate", validate);
+JsonSchema.addkeyword(`${schemaVersion}#validate`, validate);
+
+// Configure references
+Schema.setConfig(schemaVersion, "keywordReference", true);
+Schema.setConfig(schemaVersion, "keywordRecursiveReference", true);
 
 // Use the URI you chose for your meta-schema for the `$schema` in you schemas.
 Schema.add({
@@ -422,7 +510,11 @@ to validate that the new keyword is used correctly.
 // is the `then` schema, and the third is the `else` schema.
 const { JsonSchema, Schema, Keywords } = require("@hyperjump/json-schema-core");
 
-const cond = {
+
+// ... Meta-schema configuration ...
+
+// Add `cond` keyword
+JsonSchema.addkeyword("http://example.com/draft/custom/schema#cond", {
   compile: async (schema, ast) => {
     const subSchemas = Schema.map((subSchema) => JsonSchema.compileSchema(subSchema, ast), schema);
     return Promise.all(subSchemas);
@@ -433,11 +525,9 @@ const cond = {
       ? (cond[1] ? Core.interpretSchema(cond[1], instance, ast) : true)
       : (cond[2] ? Core.interpretSchema(cond[2], instance, ast) : true);
   }
-};
+});
 
-JsonSchema.addkeyword("http://example.com/draft/custom/schema#validate", Keywords.validate);
-JsonSchema.addkeyword("http://example.com/draft/custom/schema#cond", cond);
-
+// Try it out
 Schema.add({
   "$schema": "http://example.com/draft/custom/schema",
   "$id": "http://example.com/schemas/cond",
@@ -454,19 +544,21 @@ await Schema.validate(schema, 42);
 
 ### Vocabularies
 You can create vocabularies with JSC as well. A vocabulary is just a named
-collection of keywords. Creating a vocabulary takes three steps:
-1. Create a meta-schema for the vocabulary
-1. Create a meta-schema that that includes the vocabulary
-1. Register the keywords for the vocabulary
+collection of keywords.
 
 ```javascript
 const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
 const cond = require("./keywords/cond.js");
 
+
+// ... Meta-schema configuration ...
+
+// Choose a URI for your vocabulary and add keywords
 JsonSchema.addVocabulary("https://example.com/draft/custom/vocab/conditionals", {
   cond: cond
 });
 
+// Try it out
 Schema.add({
   "$schema": "http://example.com/draft/custom/schema",
   "$id": "http://example.com/schemas/cond",
