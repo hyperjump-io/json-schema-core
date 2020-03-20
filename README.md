@@ -471,7 +471,7 @@ schemaVersion = "http://example.com/draft/2019-09-strict/schema";
 
 // We want validation to function exactly the same way, so we can use the standard `validate` keyword.
 const validate = require("jschema/lib/keywords/validate");
-JsonSchema.addkeyword(`${schemaVersion}#validate`, validate);
+JsonSchema.addKeyword(`${schemaVersion}#validate`, validate);
 
 // Configure references
 Schema.setConfig(schemaVersion, "keywordReference", true);
@@ -514,7 +514,7 @@ const { JsonSchema, Schema, Keywords } = require("@hyperjump/json-schema-core");
 // ... Meta-schema configuration ...
 
 // Add `cond` keyword
-JsonSchema.addkeyword("http://example.com/draft/custom/schema#cond", {
+JsonSchema.addKeyword("http://example.com/draft/custom/schema#cond", {
   compile: async (schema, ast) => {
     const subSchemas = Schema.map((subSchema) => JsonSchema.compileSchema(subSchema, ast), schema);
     return Promise.all(subSchemas);
@@ -554,9 +554,12 @@ const cond = require("./keywords/cond.js");
 // ... Meta-schema configuration ...
 
 // Choose a URI for your vocabulary and add keywords
-JsonSchema.addVocabulary("https://example.com/draft/custom/vocab/conditionals", {
+JsonSchema.defineVocabulary("https://example.com/draft/custom/vocab/conditionals", {
   cond: cond
 });
+
+// Add your vocabulary
+JsonSchema.addVocabulary("http://example.com/draft/custom/schema", "http://example.com/draft/custom/vocab/conditionals");
 
 // Try it out
 Schema.add({
