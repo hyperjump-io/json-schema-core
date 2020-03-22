@@ -42,6 +42,9 @@ pointer points to. This allows an SDoc to represent any value in the schema
 while maintaining enough context to follow `$ref`s and track the position in the
 document.
 
+* **Schema.setConfig**: (schemaVersion: string, configName: string, configValue: string) => any
+
+    Set a configuration value for a schemaVersion.
 * **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => undefined
 
     Load a schema. See the "$id" and "$schema" sections for more details
@@ -463,108 +466,93 @@ const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
 
 // Optional: Load your meta-schema. If you don't do this, JSC will fetch it
 // using it's identifier when it's needed.
-const myCustomMetaSchema = require("./my-custom-meta-schema.schema.json");
-Schema.add(myCustomMetaSchema);
-
-// Choose a unique URI for your meta-schema
-schemaVersion = "http://example.com/draft/2019-09-strict/schema";
-
-// We want validation to function exactly the same way, so we can use the standard `validate` keyword.
-const validate = require("jschema/lib/keywords/validate");
-JsonSchema.addKeyword(`${schemaVersion}#validate`, validate);
-
-// Configure references
-Schema.setConfig(schemaVersion, "keywordReference", true);
-Schema.setConfig(schemaVersion, "keywordRecursiveReference", true);
+Schema.add({
+  "$id": "https://example.com/draft/2019-09-strict/schema",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$vocabulary": {
+    "https://json-schema.org/draft/2019-09/vocab/core": true,
+    "https://json-schema.org/draft/2019-09/vocab/applicator": true,
+    "https://json-schema.org/draft/2019-09/vocab/validation": true,
+    "https://json-schema.org/draft/2019-09/vocab/meta-data": true,
+    "https://json-schema.org/draft/2019-09/vocab/format": false,
+    "https://json-schema.org/draft/2019-09/vocab/content": true
+  },
+  ...
+});
 
 // Use the URI you chose for your meta-schema for the `$schema` in you schemas.
 Schema.add({
-  "$schema": "http://example.com/draft/2019-09-strict/schema",
   "$id": "http://example.com/schemas/string",
+  "$schema": "http://example.com/draft/2019-09-strict/schema",
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
 await JsonSchema.validate(schema, "foo");
 ```
 
-### Custom Keywords
-Creating a new keyword takes three steps
-1. Implement your keyword
-1. Create a custom meta-schema to validate your keyword (see previous section)
-1. Register your keyword
-
+### Keywords
 A keyword implementation is a module with two functions: `compile` and
 `interpret`. In the `compile` step, you can do any processing steps necessary to
-do the actual validation in the `interpret` step. The most common thing to do in
-the `compile` step is to compile sub-schemas. The `interpret` step takes the
-result of the `compile` step and returns a boolean value indicating whether
-validation has passed or failed. Use the JSON Schema keyword implementations in
-this package as examples to get started.
+do the actual validation in the `interpret` step. The most common things to do
+in the `compile` step is to follow references and compile sub-schemas. The
+`interpret` step takes the result of the `compile` step and returns a boolean
+value indicating whether validation has passed or failed. You can Use the [JSON
+Schema Validator (JSV)](https://github.com/jdesrosiers/json-schema)
+keyword implementations in this package as examples.
 
-When you have your new keyword implementation, you'll need a custom meta-schema
-to validate that the new keyword is used correctly.
+This example implements an `if`/`then`/`else`-like keyword called `cond`.
+`cond` is an array of schemas where the first is the `if` schema, the second is
+the `then` schema, and the third is the `else` schema.
 
 ```javascript
-// This example implements an `if`/`then`/`else`-like keyword called `cond`.
-// `cond` is an array of schemas where the first is the `if` schema, the second
-// is the `then` schema, and the third is the `else` schema.
 const { JsonSchema, Schema, Keywords } = require("@hyperjump/json-schema-core");
 
 
-// ... Meta-schema configuration ...
-
-// Add `cond` keyword
-JsonSchema.addKeyword("http://example.com/draft/custom/schema#cond", {
-  compile: async (schema, ast) => {
-    const subSchemas = Schema.map((subSchema) => JsonSchema.compileSchema(subSchema, ast), schema);
-    return Promise.all(subSchemas);
+const cond = {
+  compile: async (cond, ast) => {
+    const schemas = Schema.map((schema) => JsonSchema.compileSchema(schema, ast), cond);
+    return Promise.all(schemas);
   },
 
   interpret: (cond, instance, ast) => {
     return JsonSchema.interpretSchema(cond[0], instance, ast)
-      ? (cond[1] ? Core.interpretSchema(cond[1], instance, ast) : true)
-      : (cond[2] ? Core.interpretSchema(cond[2], instance, ast) : true);
+      ? (cond[1] ? JsonSchema.interpretSchema(cond[1], instance, ast) : true)
+      : (cond[2] ? JsonSchema.interpretSchema(cond[2], instance, ast) : true);
   }
 });
-
-// Try it out
-Schema.add({
-  "$schema": "http://example.com/draft/custom/schema",
-  "$id": "http://example.com/schemas/cond",
-  "type": "integer",
-  "cond": [
-    { "minimum": 10 },
-    { "multipleOf": 3 },
-    { "multipleOf": 2 }
-  ]
-});
-const schema = await Schema.get("http://example.com/schemas/cond");
-await Schema.validate(schema, 42);
 ```
 
+In order to use an keyword in an implementation, you need to add it to a
+vocabulary.
+
 ### Vocabularies
-You can create vocabularies with JSC as well. A vocabulary is just a named
-collection of keywords.
+A vocabulary is just a named collection of keywords.
 
 ```javascript
 const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
 const cond = require("./keywords/cond.js");
 
 
-// ... Meta-schema configuration ...
-
 // Choose a URI for your vocabulary and add keywords
 JsonSchema.defineVocabulary("https://example.com/draft/custom/vocab/conditionals", {
   cond: cond
 });
 
-// Add your vocabulary
-JsonSchema.addVocabulary("http://example.com/draft/custom/schema", "http://example.com/draft/custom/vocab/conditionals");
+// Create a new meta-schema an add your vocabulary to `$vocabulary`
+Schema.add({
+  "$id": "https://example.com/draft/custom/schema",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$vocabulary": {
+    ...
+    "https://example.com/draft/custom/vocab/conditionals": true
+  },
+  ...
+});
 
 // Try it out
 Schema.add({
-  "$schema": "http://example.com/draft/custom/schema",
-  "$id": "http://example.com/schemas/cond",
+  "$id": "http://example.com/schemas/cond-example",
+  "$schema": "https://example.com/draft/custom/schema",
   "type": "integer",
   "cond": [
     { "minimum": 10 },
@@ -572,7 +560,7 @@ Schema.add({
     { "multipleOf": 2 }
   ]
 });
-const schema = await Schema.get("http://example.com/schemas/cond");
+const schema = await Schema.get("http://example.com/schemas/cond-example");
 await JsonSchema.validate(schema, 42);
 ```
 
