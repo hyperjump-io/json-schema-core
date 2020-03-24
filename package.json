@@ -39,6 +39,7 @@
   "dependencies": {
     "@hyperjump/json-pointer": "^0.6.0",
     "@hyperjump/pact": "^0.1.0",
+    "content-type": "^1.0.4",
     "make-fetch-happen": "^8.0.4",
     "pubsub-js": "^1.8.0"
   }
