@@ -83,7 +83,7 @@ identifier specified when using `Schema.add` to load a schema.
 JSC can fetch schemas from the web or from the file system, but when fetching
 from the file system, there are limitations for security reasons. If
 your schema has an identifier with an http scheme (**http**://example.com), it's
-not allowed to reference (`$ref`) schemas with a file scheme
+not allowed to reference schemas with a file scheme
 (**file**:///path/to/my/schemas).
 
 Internal identifiers (`$id`s) are resolved against the external identifier of
