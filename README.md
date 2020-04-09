@@ -210,6 +210,20 @@ Schema.add(schemaJSON); // Error: Couldn't determine schema version
 const schema = Schema.get("http://example.com/schemas/string"); // Error: Couldn't determine schema version
 ```
 
+### Meta Validation
+By default JSC will validate all schemas against their meta-schema. However, the
+only time you really need this is when developing schemas. When JSV is running
+in a production environment or you are working with third-party schemas that you
+trust to be correct, you can turn off meta-validation to boost performance.
+
+```javascript
+JsonSchema.setShouldMetaValidate(false);
+
+const schema = await Schema.get("http://example.com/schemas/foo");
+const isString = await JsonSchema.validate(schema);
+isString("foo"); // true
+```
+
 ## Instance
 An Instance Document (IDoc) is like a Schema Document (SDoc) except with much
 more limited functionality.
