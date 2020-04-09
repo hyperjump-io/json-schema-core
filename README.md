@@ -59,6 +59,9 @@ document.
 * **Schema.value**: (doc: SDoc) => any
 
     The portion of the schema the document's JSON Pointer points to.
+* **Schema.has**: (key: string, doc: SDoc) => Promise<SDoc>
+
+    Similar to `key in schema`.
 * **Schema.step**: (key: string, doc: SDoc) => Promise<SDoc>
 
     Similar to `schema[key]`, but returns an SDoc.
