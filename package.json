@@ -13,7 +13,7 @@
     "build": "rollup --config rollup.config.js",
     "prepublishOnly": "npm run build"
   },
-  "repository": "github:jdesrosiers/json-schema-core",
+  "repository": "github:hyperjump-io/json-schema-core",
   "keywords": [
     "JSON Schema",
     "vocabulary",

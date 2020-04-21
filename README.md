@@ -1,4 +1,4 @@
-# JSON Schema Core
+# Hyperjump - JSON Schema Core
 JSON Schema Core (JSC) is a framework for building JSON Schema based validators
 and other tools.
 
@@ -385,7 +385,7 @@ JSC as a framework for building other types of JSON Schema based tools such as
 code generators or form generators.
 
 In addition to this documentation you should be able to look at the
-[JSV](https://github.com/jdesrosiers/json-schema) code to see an example of how
+[JSV](https://github.com/hyperjump-io/json-schema-validator) code to see an example of how
 to add your custom plugins because it's all implemented the same way.
 
 ### References
@@ -514,7 +514,7 @@ do the actual validation in the `interpret` step. The most common things to do
 in the `compile` step is to follow references and compile sub-schemas. The
 `interpret` step takes the result of the `compile` step and returns a boolean
 value indicating whether validation has passed or failed. You can Use the [JSON
-Schema Validator (JSV)](https://github.com/jdesrosiers/json-schema)
+Schema Validator (JSV)](https://github.com/hyperjump-io/json-schema-validator)
 keyword implementations in this package as examples.
 
 This example implements an `if`/`then`/`else`-like keyword called `cond`.
