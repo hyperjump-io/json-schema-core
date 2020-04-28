@@ -68,7 +68,7 @@ document.
 * **Schema.sibling**: (key: string, doc: SDoc) => Promise<SDoc>
 
     Similar to `Schema.step`, but gets an adjacent key.
-* **Schema.entries**: (doc: SDoc) => [Promise<[string, SDoc]>]
+* **Schema.entries**: (doc: SDoc) => Promise<[[string, SDoc]]>
 
     Similar to `Object.entries`, but returns SDocs for values.
 * **Schema.map**: (fn: (item: Promise<SDoc>, index: integer) => T, doc: SDoc) => [T]
