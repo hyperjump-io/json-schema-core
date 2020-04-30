@@ -71,7 +71,7 @@ document.
 * **Schema.entries**: (doc: SDoc) => Promise<[[string, SDoc]]>
 
     Similar to `Object.entries`, but returns SDocs for values.
-* **Schema.map**: (fn: (item: Promise<SDoc>, index: integer) => T, doc: SDoc) => [T]
+* **Schema.map**: (fn: (item: Promise<SDoc>, index: integer) => T, doc: SDoc) => Promise<[T]>
 
     A `map` function for an SDoc whose value is an array.
 
