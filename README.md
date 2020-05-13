@@ -441,8 +441,9 @@ you want to support.
 * **$id**: *(draft-2019-09)* Same as `$id` except with same-document reference
   support split out into `$anchor`.
 
-* **$anchor**: *(draft-2019-09)* Same as same-document reference draft 2019-09
-  `$id`s.
+* **$anchor**: *(draft-2019-09)* Same-document reference.
+
+* **$recursiveAnchor**: *(draft-2019-09)* Dynamic scope same-document reference.
 
 In draft-2019-09, `$id` was redefined from being a resolution scope modifier to
 being an inlined reference. This means that JSON Pointers can not cross into
