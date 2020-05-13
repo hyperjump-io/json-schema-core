@@ -95,7 +95,7 @@ All identifiers must be absolute URIs. External identifiers are required to be
 absolute URIs and internal identifiers must resolve to absolute URIs.
 
 ```javascript
-cosnt { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
 
 
 // Example: Inline schema with external identifier
