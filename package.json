@@ -37,14 +37,15 @@
     "eslint-plugin-import": "^2.20.2",
     "mocha": "^5.2.0",
     "nock": "^9.6.1",
-    "rollup": "^2.7.2",
+    "rollup": "^2.12.1",
     "rollup-plugin-terser": "^5.3.0"
   },
   "dependencies": {
     "@hyperjump/json-pointer": "^0.8.0",
-    "@hyperjump/pact": "^0.1.0",
+    "@hyperjump/pact": "^0.1.2",
     "content-type": "^1.0.4",
-    "make-fetch-happen": "^8.0.4",
-    "pubsub-js": "^1.8.0"
+    "make-fetch-happen": "^8.0.7",
+    "pubsub-js": "^1.8.0",
+    "url-resolve-browser": "^1.2.0"
   }
 }
