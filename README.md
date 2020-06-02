@@ -385,32 +385,29 @@ JSC as a framework for building other types of JSON Schema based tools such as
 code generators or form generators.
 
 In addition to this documentation you should be able to look at the
-[JSV](https://github.com/hyperjump-io/json-schema-validator) code to see an example of how
-to add your custom plugins because it's all implemented the same way.
+[JSV](https://github.com/hyperjump-io/json-schema-validator) code to see an
+example of how to add your custom plugins because it's all implemented the same
+way.
 
 ### References
 The `$ref` keyword has changed a couple times over the last several drafts. JSC
 allows you to configure which version(s) of `$ref`s you want to support. There
-are four types of references.
+are several types of references.
 
-* **JSON Reference**: *(draft-04)* References are defined in a separate spec
-  from JSON Schema. The JSON Schema spec only constrains `$ref` in how URIs are
-  resolved with respect to `id`.
+* **JSON Reference**: *(draft-04/06/07)* In draft-04, references were defined in
+  a separate spec from JSON Schema. The JSON Schema spec only constrained `$ref`
+  in how URIs are resolved with respect to `id`. Then in draft-06/07, JSON
+  Schema absorbed the JSON Reference spec and further constrained `$ref` to only
+  be allowed where schemas are allowed. JSC doesn't support this constraint
+  because it can't be done in a keyword agnostic way.
 
-* **JSON Schema Reference**: *(draft-06/7)* The JSON Schema spec absorbed the
-  JSON Reference spec and further constrained `$ref` to only be allowed where
-  schemas are allowed. JSC doesn't support this type of reference because I
-  haven't figured out how to do it a keyword agnostic way. You can use JSON
-  References instead and it will just be a little more lenient about where
-  references are allowed.
+* **JSON Schema Reference**: *(draft-2019-09)* In draft 2019-09, a reference was
+  changed from being an object with a `$ref` property to the value of a `$ref`
+  keyword. This allowed `$ref` to behave more like a keyword.
 
-* **Keyword Reference**: *(draft-2019-09)* A reference was changed from being an
-  object with a `$ref` property to the value of a `$ref` keyword. This allowed
-  `$ref` to behave more like a keyword.
-
-* **Keyword Recursive Reference**: *(draft-2019-09)* Along with
-  `$recursiveAnchor`, this new type of reference was added to the spec to make
-  it easier to write custom meta-schemas.
+* **Dynamic JSON Schema Reference**: *(draft-2019-09)* In draft 2019-09, the
+  concept of a dynamic scope reference was added to make it easier to extend
+  recursive schemas. This was added to support building custom meta-schemas.
 
 References can be configured by `$schema` identifier. When you create a custom
 meta-schema, you will need to configure which types of references your schema
@@ -421,11 +418,11 @@ const { Schema } = require("@hyperjump/json-schema-core");
 
 
 // Configure draft-2019-09 style references
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "keywordReference", true);
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "keywordRecursiveReference", true);
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "jsrefToken", "$ref");
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "dynamicJsrefToken", "$recursiveRef");
 
 // Configure draft-04/6/7 style references
-Schema.setConfig("http://json-schema.org/draft-04/schema", "jsonReference", true);
+Schema.setConfig("http://json-schema.org/draft-04/schema", "jrefToken", "$ref");
 ```
 
 ### Identifiers
@@ -444,6 +441,10 @@ you want to support.
 * **$anchor**: *(draft-2019-09)* Same-document reference.
 
 * **$recursiveAnchor**: *(draft-2019-09)* Dynamic scope same-document reference.
+  Value is a boolean that is only allowed at the root of a schema.
+
+* **$dynamicAnchor**: *(draft-2019-09)* Dynamic scope same-document reference.
+  Value is a string and works like `$anchor`.
 
 In draft-2019-09, `$id` was redefined from being a resolution scope modifier to
 being an inlined reference. This means that JSON Pointers can not cross into
@@ -463,6 +464,7 @@ const { Schema } = require("@hyperjump/json-schema-core");
 // Configure draft-2019-09 style identifiers
 Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "idToken", "$id");
 Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "anchorToken", "$anchor");
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "recursiveAnchorToken", "$recursiveAnchor");
 
 // Configure draft-06/7 style references
 Schema.setConfig("http://json-schema.org/draft-04/schema", "idToken", "$id");
