@@ -319,7 +319,7 @@ Schema.add({
 });
 JsonSchema.setMetaOutputFormat(JsonSchema.BASIC);
 const schema = await Schema.get("http://example.com/schemas/foo");
-const isString = await JsonSchema.validate(schema); // Error: {
+const isString = await JsonSchema.validate(schema); // InvalidSchemaError: {
 //   "keyword": "https://json-schema.org/draft/2019-09/schema",
 //   "absoluteKeywordLocation": "https://json-schema.org/draft/2019-09/schema#",
 //   "instanceLocation": "#",
