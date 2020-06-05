@@ -59,6 +59,9 @@ document.
 * **Schema.value**: (doc: SDoc) => any
 
     The portion of the schema the document's JSON Pointer points to.
+* **Schema.typeOf**: (doc: SDoc, type: string) => boolean
+
+    Determines if the JSON type of the given doc matches the given type
 * **Schema.has**: (key: string, doc: SDoc) => Promise<SDoc>
 
     Similar to `key in schema`.
@@ -71,9 +74,15 @@ document.
 * **Schema.entries**: (doc: SDoc) => Promise<[[string, SDoc]]>
 
     Similar to `Object.entries`, but returns SDocs for values.
+* **Schema.keys**: (doc: SDoc) => [string]
+
+    Similar to `Object.keys`.
 * **Schema.map**: (fn: (item: Promise<SDoc>, index: integer) => T, doc: SDoc) => Promise<[T]>
 
     A `map` function for an SDoc whose value is an array.
+* **Schema.length**: (doc: SDoc) => number
+
+    Similar to `Array.prototype.length`.
 
 ### $id
 JSC requires that all schemas are identified by at least one URI. There are two
@@ -241,12 +250,18 @@ more limited functionality.
 * **Instance.value**: (doc: IDoc) => any
 
     The portion of the instance that the document's JSON Pointer points to.
+* **Instance.typeOf**: (doc: IDoc, type: string) => boolean
+
+    Determines if the JSON type of the given doc matches the given type.
 * **Instance.step**: (key: string, doc: IDoc) => IDoc
 
     Similar to `schema[key]`, but returns a IDoc.
-* **Instance.entries**: (doc: IDoc) => [key, IDoc]
+* **Instance.entries**: (doc: IDoc) => [string, IDoc]
 
     Similar to `Object.entries`, but returns IDocs for values.
+* **Instance.keys**: (doc: IDoc) => [string]
+
+    Similar to `Object.keys`.
 * **Instance.map**: (fn: (item: IDoc, index: integer) => T, doc: IDoc) => [T]
 
     A `map` function for a IDoc whose value is an array.
@@ -259,6 +274,9 @@ more limited functionality.
 * **Instance.some**: (fn: (doc: IDoc, index: integer) => boolean, doc: IDoc) => boolean
 
     A `some` function for a IDoc whose value is an array.
+* **Instance.length**: (doc: IDoc) => number
+
+    Similar to `Array.prototype.length`.
 
 ## Output
 JSC supports all of the standard output formats specified for JSON Schema
