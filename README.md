@@ -480,16 +480,19 @@ const { Schema } = require("@hyperjump/json-schema-core");
 
 
 // Configure draft-2019-09 style identifiers
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "idToken", "$id");
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "baseToken", "$id");
+Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "embeddedToken", "$id");
 Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "anchorToken", "$anchor");
 Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "recursiveAnchorToken", "$recursiveAnchor");
 
 // Configure draft-06/7 style references
-Schema.setConfig("http://json-schema.org/draft-04/schema", "idToken", "$id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "baseToken", "$id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "embeddedToken", "$id");
 Schema.setConfig("http://json-schema.org/draft-04/schema", "anchorToken", "$id");
 
 // Configure draft-04 style references
-Schema.setConfig("http://json-schema.org/draft-04/schema", "idToken", "id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "baseToken", "id");
+Schema.setConfig("http://json-schema.org/draft-04/schema", "embeddedToken", "id");
 Schema.setConfig("http://json-schema.org/draft-04/schema", "anchorToken", "id");
 ```
 
