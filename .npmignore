@@ -4,3 +4,4 @@ rollup.config.js
 .eslintrc.json
 **/*.spec.js
 **/*.fixture.json
+TODO.md
