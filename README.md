@@ -8,6 +8,7 @@ It includes tools for:
 * Building custom keywords
 * Building vocabularies
 * Standard output formats
+* Compiling schemas for validating multiple instances
 
 ## Install
 JSC is designed to run in a vanilla node.js environment, but has no dependencies
@@ -42,9 +43,6 @@ pointer points to. This allows an SDoc to represent any value in the schema
 while maintaining enough context to follow `$ref`s and track the position in the
 document.
 
-* **Schema.setConfig**: (schemaVersion: string, configName: string, configValue: string) => any
-
-    Set a configuration value for a schemaVersion.
 * **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => undefined
 
     Load a schema. See the "$id" and "$schema" sections for more details
@@ -68,9 +66,6 @@ document.
 * **Schema.step**: (key: string, doc: SDoc) => Promise<SDoc>
 
     Similar to `schema[key]`, but returns an SDoc.
-* **Schema.sibling**: (key: string, doc: SDoc) => Promise<SDoc>
-
-    Similar to `Schema.step`, but gets an adjacent key.
 * **Schema.entries**: (doc: SDoc) => Promise<[[string, SDoc]]>
 
     Similar to `Object.entries`, but returns SDocs for values.
@@ -104,7 +99,7 @@ All identifiers must be absolute URIs. External identifiers are required to be
 absolute URIs and internal identifiers must resolve to absolute URIs.
 
 ```javascript
-const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
 // Example: Inline schema with external identifier
@@ -177,7 +172,7 @@ const schema = await Schema.get("file:///path/to/my/schemas/string.schema.json")
 
 // Example: Reference file from network context
 const schema = await Schema.get("http://example.com/schemas/baz");
-const validateString = await JsonSchema.validate(schema); // Error: Can't access file resource from network context
+await Core.validate(schema); // Error: Can't access file resource from network context
 ```
 
 ### $schema
@@ -217,20 +212,6 @@ Schema.add(schemaJSON); // Error: Couldn't determine schema version
 
 // Example: No schema version external
 const schema = Schema.get("http://example.com/schemas/string"); // Error: Couldn't determine schema version
-```
-
-### Meta Validation
-By default JSC will validate all schemas against their meta-schema. However, the
-only time you really need this is when developing schemas. When JSV is running
-in a production environment or you are working with third-party schemas that you
-trust to be correct, you can turn off meta-validation to boost performance.
-
-```javascript
-JsonSchema.setShouldMetaValidate(false);
-
-const schema = await Schema.get("http://example.com/schemas/foo");
-const isString = await JsonSchema.validate(schema);
-isString("foo"); // true
 ```
 
 ## Instance
@@ -278,15 +259,52 @@ more limited functionality.
 
     Similar to `Array.prototype.length`.
 
+## Validation
+Some helper functions are provided to assist in building validation functions.
+
+* **Core.validate**: (schema: SDoc, value: any, outputFormat: OutputFormat = Core.FLAG) => Promise<Output>
+
+    A curried function that validates a JavaScript value against a schema.
+* **Core.compile**: (schema: SDoc) => Promise<CompiledSchema>
+
+    Compile a schema to be used interpreted later. A compiled schema is a JSON
+    serializable structure that can be serialized an restored for later use.
+* **Core.interpret**: (schema: CompiledSchema, instance: Instance, outputFormat = Core.FLAG) => <Output>
+
+    A curried function for validating an instance against a compiled schema.
+
+```javascript
+const { Core, Schema } = require("@hyperjump/json-schema-core");
+
+
+// Example: Inline schema with external identifier
+Schema.add({
+  "$id": "http://example.com/schemas/string",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "string"
+});
+const schema = await Schema.get("http://example.com/schemas/string");
+
+// Generate a validation function from a Schema Document
+const isString = await Core.validate(schema);
+
+// Validate a value from a Schema Document in one step
+const result = await Core.validate(schema, "foo");
+
+// Compile a Schema Document for use later
+const compiledSchema = await Core.compile(schema);
+
+// Generate a validation function from a compiled schema
+const isString = Core.interpret(compiledSchema);
+
+// Validate an instance from a compiled schema
+const result = Core.interpret(compiledSchema, Instance.cons("foo"));
+```
+
 ## Output
 JSC supports all of the standard output formats specified for JSON Schema
 draft-2019-09 and is separately configurable for instance validation and
 meta-validtion.
-
-* JsonSchema.FLAG - Default for instance validation
-* JsonSchema.BASIC
-* JsonSchema.DETAILED - Default for meta-validation
-* JsonSchema.VERBOSE
 
 This implementation does not include the suggested `keywordLocation` property in
 the output unit. I think `absoluteKeywordLocation`+`instanceLocation` is
@@ -302,8 +320,26 @@ the actual schema to find what draft was used. The `schema` property gives us
 enough information to not have to go back to the schema to know what draft is
 being used.
 
+By default JSC will validate all schemas against their meta-schema. However, the
+only time you really need this is when developing schemas. When JSC is running
+in a production environment or you are working with third-party schemas that you
+trust to be correct, you can turn off meta-validation to boost performance.
+
+* **Core.setMetaOutputFormat**: (outputFormat: OutputFormat) => undefined
+
+    Set the output format used for schema validation. Default Core.DETAILED
+* **Core.setShouldMetaValidate**: (shouldMetaValidate: boolean) => undefined
+
+    Turn schema validation on or off. Default true
+* **OutputFormat**: An enum of available output formats
+
+    * Core.FLAG - Default for instance validation
+    * Core.BASIC
+    * Core.DETAILED - Default for meta-validation
+    * Core.VERBOSE
+
 ```javascript
-const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
 // Example: Specify instance validation output format
@@ -313,8 +349,8 @@ Schema.add({
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
-const isString = await JsonSchema.validate(schema);
-const output = isString(42, JsonSchema.BASIC); // => {
+const isString = await Core.validate(schema);
+const output = isString(42, Core.BASIC); // => {
 //   "keyword": "https://json-schema.org/draft/2019-09/schema",
 //   "absoluteKeywordLocation": "http://example.com/schemas/string#",
 //   "instanceLocation": "#",
@@ -335,9 +371,9 @@ Schema.add({
   "$id": "http://example.com/schemas/foo",
   "type": "this-is-not-a-valid-type"
 });
-JsonSchema.setMetaOutputFormat(JsonSchema.BASIC);
+Core.setMetaOutputFormat(Core.BASIC);
 const schema = await Schema.get("http://example.com/schemas/foo");
-const isString = await JsonSchema.validate(schema); // InvalidSchemaError: {
+const isString = await Core.validate(schema); // InvalidSchemaError: {
 //   "keyword": "https://json-schema.org/draft/2019-09/schema",
 //   "absoluteKeywordLocation": "https://json-schema.org/draft/2019-09/schema#",
 //   "instanceLocation": "#",
@@ -352,6 +388,11 @@ const isString = await JsonSchema.validate(schema); // InvalidSchemaError: {
 //     ...
 //   ]
 // }
+
+// Example: Turn off schema validation
+Core.setShouldMetaValidate(false);
+const schema = await Schema.get("http://example.com/schemas/foo"); // Load invalid schema
+const isString = await Core.validate(schema); // Schema compilation succeeds even though schema is invalid
 ```
 
 ## PubSub
@@ -363,7 +404,7 @@ use-cases are identified for them.
 
 ```javascript
 const PubSub = require("pubsub-js");
-const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
 Schema.add({
@@ -372,7 +413,7 @@ Schema.add({
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
-const isString = await JsonSchema.validate(schema);
+const isString = await Core.validate(schema);
 
 const results = [];
 const subscriptionToken = PubSub.subscribe("result", (message, result) => {
@@ -406,6 +447,13 @@ In addition to this documentation you should be able to look at the
 [JSV](https://github.com/hyperjump-io/json-schema-validator) code to see an
 example of how to add your custom plugins because it's all implemented the same
 way.
+
+* **Schema.setConfig**: (schemaVersion: string, configName: string, configValue: string) => undefined
+
+    Set a configuration value for a schemaVersion.
+* **Schema.getConfig**: (schemaVersion: string, configName: string) => any
+
+    Get a configuration value for a schemaVersion.
 
 ### References
 The `$ref` keyword has changed a couple times over the last several drafts. JSC
@@ -502,7 +550,7 @@ than the standard meta-schema. Once you have your custom meta-schema ready, it's
 just a couple lines of code to start using it.
 
 ```javascript
-const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
 // Optional: Load your meta-schema. If you don't do this, JSC will fetch it
@@ -528,39 +576,93 @@ Schema.add({
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
-await JsonSchema.validate(schema, "foo");
+await Core.validate(schema, "foo");
 ```
 
 ### Keywords
-A keyword implementation is a module with two functions: `compile` and
+A keyword implementation is a module with at least the functions: `compile` and
 `interpret`. In the `compile` step, you can do any processing steps necessary to
 do the actual validation in the `interpret` step. The most common things to do
 in the `compile` step is to follow references and compile sub-schemas. The
 `interpret` step takes the result of the `compile` step and returns a boolean
-value indicating whether validation has passed or failed. You can Use the [JSON
-Schema Validator (JSV)](https://github.com/hyperjump-io/json-schema-validator)
-keyword implementations in this package as examples.
+value indicating whether validation has passed or failed.
+
+If your custom keyword is an applicator and your dialect supports
+`unevaluatedProperties` and `unevaluatedItems`, you'll also need to provide the
+`collectEvaluatedProperties` and `collectEvaluatedItems` functions.
+
+You can Use the [JSV](https://github.com/hyperjump-io/json-schema-validator)
+keyword implementations as examples when creating your own keywords.
+
+* **Core.getKeyword**: (keywordId: string) => Keyword
+
+    Retreive a keyword by it's identifier.
+* **Core.hasKeyword**: (keywordId: string) => boolean
+
+    Query whether a keyword implementation exists.
+* **Core.compileSchema**: (schema: SDoc, ast: AST) => undefined
+
+    Compile a schema.
+* **Core.interpretSchmea**: (schemaUri: string, instance: Instance, ast: AST) => boolean
+
+    Finds the compiled schema in the ast for the schemaUri and validates the
+    instance against the it. The result is a boolean indicating if the keyword
+    passes validation.
+* **Core.collectEvaluatedProperties**: (schemaUri: string, instance: Instance, ast: AST) => string[]
+
+    Walk a schema and collect any property names that are evaluated by the
+    schemas it finds. A property is not considered evaluated if the schema
+    containing it is not valid.
+* **Core.collectEvaluatedItems**: (schemaUri: string, instance: Instance, ast: AST) => number
+
+    Walk a schema and collect maximum number of items that are evaluated by the
+    schemas it finds. An item is not considered evaluated if the schema
+    containing it is not valid.
 
 This example implements an `if`/`then`/`else`-like keyword called `cond`.
 `cond` is an array of schemas where the first is the `if` schema, the second is
 the `then` schema, and the third is the `else` schema.
 
 ```javascript
-const { JsonSchema, Schema, Keywords } = require("@hyperjump/json-schema-core");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
-const cond = {
-  compile: async (cond, ast) => {
-    const schemas = Schema.map((schema) => JsonSchema.compileSchema(schema, ast), cond);
-    return Promise.all(schemas);
-  },
+const compile = async (schema, ast, parentSchema) => {
+  const schemas = Schema.map((schema) => Core.compileSchema(schema, ast), cond);
+  return Promise.all(schemas);
+};
 
-  interpret: (cond, instance, ast) => {
-    return JsonSchema.interpretSchema(cond[0], instance, ast)
-      ? (cond[1] ? JsonSchema.interpretSchema(cond[1], instance, ast) : true)
-      : (cond[2] ? JsonSchema.interpretSchema(cond[2], instance, ast) : true);
+const interpret = (cond, instance, ast) => {
+  return Core.interpretSchema(cond[0], instance, ast)
+    ? (conditional[1] ? Core.interpretSchema(cond[1], instance, ast) : true)
+    : (conditional[2] ? Core.interpretSchema(cond[2], instance, ast) : true);
+};
+
+const collectEvaluatedProperties = (cond, instance, ast) => {
+  const propertyNames = Core.collectEvaluatedProperties(conditional[0], instance, ast);
+  const branch = propertyNames ? 1 : 2;
+
+  if (conditional[branch]) {
+    const branchPropertyNames = Core.collectEvaluatedProperties(conditional[branch], instance, ast);
+    return branchPropertyNames && (propertyNames || []).concat(branchPropertyNames);
+  } else {
+    return propertyNames || [];
   }
-});
+};
+
+const collectEvaluatedItems = (cond, instance, ast) => {
+  const tupleLength = Core.collectEvaluatedItems(cond[0], instance, ast);
+  const branch = typeof tupleLength === "number" ? 1 : 2;
+
+  if (conditional[branch]) {
+    const branchTupleLength = Core.collectEvaluatedItems(conditional[branch], instance, ast);
+    return branchTupleLength !== false && Math.max(tupleLength, branchTupleLength);
+  } else {
+    return tupleLength || 0;
+  }
+};
+
+module.exports = { compile, interpret, collectEvaluatedProperties, collectEvaluatedItems };
 ```
 
 In order to use an keyword in an implementation, you need to add it to a
@@ -569,13 +671,18 @@ vocabulary.
 ### Vocabularies
 A vocabulary is just a named collection of keywords.
 
+* **Core.defineVocabulary**: (vocabularyId: string, keywords: { [keywordId]: Keyword }) => undefined
+
+    Define a vocabulary giving it an identifier and an object that maps keyword
+    identifiers to keyword implementations.
+
 ```javascript
-const { JsonSchema, Schema } = require("@hyperjump/json-schema-core");
-const cond = require("./keywords/cond.js");
+const { Core, Schema } = require("@hyperjump/json-schema-core");
+const cond = require("./keywords/cond");
 
 
 // Choose a URI for your vocabulary and add keywords
-JsonSchema.defineVocabulary("https://example.com/draft/custom/vocab/conditionals", {
+Core.defineVocabulary("https://example.com/draft/custom/vocab/conditionals", {
   cond: cond
 });
 
@@ -602,7 +709,7 @@ Schema.add({
   ]
 });
 const schema = await Schema.get("http://example.com/schemas/cond-example");
-await JsonSchema.validate(schema, 42);
+await Core.validate(schema, 42);
 ```
 
 ## Contributing
