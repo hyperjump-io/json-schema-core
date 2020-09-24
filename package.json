@@ -44,7 +44,7 @@
     "@hyperjump/json-pointer": "^0.8.0",
     "@hyperjump/pact": "^0.1.2",
     "content-type": "^1.0.4",
-    "make-fetch-happen": "^8.0.7",
+    "node-fetch": "^2.6.1",
     "pubsub-js": "^1.8.0",
     "url-resolve-browser": "^1.2.0"
   }

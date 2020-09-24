@@ -1,5 +1,4 @@
 dist/
 node_modules/
-http-cache/
 package-lock.json
 TODO.md
