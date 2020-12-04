@@ -6,8 +6,9 @@ It includes tools for:
 * Working with schemas (`$id`, `$schema`, `$ref`, etc)
 * Working with instances
 * Building custom keywords
-* Building vocabularies
+* Building custom vocabularies
 * Standard output formats
+* Custom output formats
 * Compiling schemas for validating multiple instances
 
 ## Install
@@ -46,7 +47,7 @@ document.
 * **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => undefined
 
     Load a schema. See the "$id" and "$schema" sections for more details
-* **Schema.get**: (url: URI, contextDoc?: SDoc, recursive: boolean = false) => Promise<SDoc>
+* **Schema.get**: (url: URI, contextDoc?: SDoc) => Promise<SDoc>
 
     Fetch a schema. Schemas can come from an HTTP request, a file, or a schema
     that was added with `Schema.add`.
@@ -54,6 +55,9 @@ document.
 
     Returns a URI including the id and JSON Pointer that represents a value
     within the schema.
+* **Schema.getAnchorPointer**: (doc: SDoc, anchor: string) => any
+
+    Get a JSON Pointer for the location in the schema that the anchor refers to.
 * **Schema.value**: (doc: SDoc) => any
 
     The portion of the schema the document's JSON Pointer points to.
@@ -79,7 +83,7 @@ document.
 
     Similar to `Array.prototype.length`.
 
-### $id
+### Schema Identification
 JSC requires that all schemas are identified by at least one URI. There are two
 types of schema identifiers, internal and external. An internal identifier is an
 identifier that is specified within the schema using `$id`. An external
@@ -439,9 +443,9 @@ results; // => [
 
 ## Customize
 JSC uses a micro-kernel architecture, so it's highly customizable. Everything
-is a plugin, even the validation logic is a plugin. So, in theory, you can use
-JSC as a framework for building other types of JSON Schema based tools such as
-code generators or form generators.
+is a plugin, even the validation logic. This allows you to use JSC as a
+framework for building other types of JSON Schema based tools such as code
+generators or form generators.
 
 In addition to this documentation you should be able to look at the
 [JSV](https://github.com/hyperjump-io/json-schema-validator) code to see an
@@ -467,33 +471,36 @@ are several types of references.
   be allowed where schemas are allowed. JSC doesn't support this constraint
   because it can't be done in a keyword agnostic way.
 
-* **JSON Schema Reference**: *(draft-2019-09)* In draft 2019-09, a reference was
-  changed from being an object with a `$ref` property to the value of a `$ref`
-  keyword. This allowed `$ref` to behave more like a keyword.
+* **JSON Schema Reference**: *(draft-2019-09+)* In draft 2019-09, a reference
+  was changed from being an object with a `$ref` property to the value of a
+  `$ref` keyword. This allowed `$ref` to behave more like a keyword.
 
-* **Dynamic JSON Schema Reference**: *(draft-2019-09)* In draft 2019-09, the
+* **Dynamic JSON Schema Reference**: *(draft-2019-09+)* In draft 2019-09, the
   concept of a dynamic scope reference was added to make it easier to extend
   recursive schemas. This was added to support building custom meta-schemas.
 
-References can be configured by `$schema` identifier. When you create a custom
-meta-schema, you will need to configure which types of references your schema
-version supports. You do this with `Schema.setConfig`.
+Draft-04/6/7 style references are configured via dialect configuration using
+`Schema.setConfig`. Draft-2019-09+ style references are just keywords and can be
+added as part of a vocabulary.
 
 ```javascript
 const { Schema } = require("@hyperjump/json-schema-core");
 
 
-// Configure draft-2019-09 style references
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "jsrefToken", "$ref");
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "dynamicJsrefToken", "$recursiveRef");
-
 // Configure draft-04/6/7 style references
 Schema.setConfig("http://json-schema.org/draft-04/schema", "jrefToken", "$ref");
+
+// Configure draft-2019-09 style references
+Core.defineVocabulary("https://example.com/draft/custom/vocab/core", {
+  "$ref": Keywords.ref,
+  "$dynamicRef": Keywords.dynamicRef,
+  ...
+});
 ```
 
 ### Identifiers
 The `$id` keyword has seen it's fair share of churn as well. Although the spec
-around this keyword was rewritten an clarified many times, the vast majority of
+around this keyword was rewritten and clarified many times, the vast majority of
 changes have simply been name changes. JSC allows you to configure which version
 you want to support.
 
@@ -603,17 +610,17 @@ keyword implementations as examples when creating your own keywords.
 * **Core.compileSchema**: (schema: SDoc, ast: AST) => undefined
 
     Compile a schema.
-* **Core.interpretSchmea**: (schemaUri: string, instance: Instance, ast: AST) => boolean
+* **Core.interpretSchmea**: (schemaUri: string, instance: Instance, ast: AST, dynamicAnchors: Map[anchor: String, uri: String]) => boolean
 
     Finds the compiled schema in the ast for the schemaUri and validates the
     instance against the it. The result is a boolean indicating if the keyword
     passes validation.
-* **Core.collectEvaluatedProperties**: (schemaUri: string, instance: Instance, ast: AST) => string[]
+* **Core.collectEvaluatedProperties**: (schemaUri: string, instance: Instance, ast: AST, dynamicAnchors: Map[anchor: String, uri: String]) => string[]
 
     Walk a schema and collect any property names that are evaluated by the
     schemas it finds. A property is not considered evaluated if the schema
     containing it is not valid.
-* **Core.collectEvaluatedItems**: (schemaUri: string, instance: Instance, ast: AST) => number
+* **Core.collectEvaluatedItems**: (schemaUri: string, instance: Instance, ast: AST, dynamicAnchors: Map[anchor: String, uri: String]) => number
 
     Walk a schema and collect maximum number of items that are evaluated by the
     schemas it finds. An item is not considered evaluated if the schema
@@ -632,30 +639,30 @@ const compile = async (schema, ast, parentSchema) => {
   return Promise.all(schemas);
 };
 
-const interpret = (cond, instance, ast) => {
-  return Core.interpretSchema(cond[0], instance, ast)
-    ? (conditional[1] ? Core.interpretSchema(cond[1], instance, ast) : true)
-    : (conditional[2] ? Core.interpretSchema(cond[2], instance, ast) : true);
+const interpret = (cond, instance, ast, dynamicAnchors) => {
+  return Core.interpretSchema(cond[0], instance, ast, dynamicAnchors)
+    ? (conditional[1] ? Core.interpretSchema(cond[1], instance, ast, dynamicAnchors) : true)
+    : (conditional[2] ? Core.interpretSchema(cond[2], instance, ast, dynamicAnchors) : true);
 };
 
-const collectEvaluatedProperties = (cond, instance, ast) => {
-  const propertyNames = Core.collectEvaluatedProperties(conditional[0], instance, ast);
+const collectEvaluatedProperties = (cond, instance, ast, dynamicAnchors) => {
+  const propertyNames = Core.collectEvaluatedProperties(conditional[0], instance, ast, dynamicAnchors);
   const branch = propertyNames ? 1 : 2;
 
   if (conditional[branch]) {
-    const branchPropertyNames = Core.collectEvaluatedProperties(conditional[branch], instance, ast);
+    const branchPropertyNames = Core.collectEvaluatedProperties(conditional[branch], instance, ast, dynamicAnchors);
     return branchPropertyNames && (propertyNames || []).concat(branchPropertyNames);
   } else {
     return propertyNames || [];
   }
 };
 
-const collectEvaluatedItems = (cond, instance, ast) => {
-  const tupleLength = Core.collectEvaluatedItems(cond[0], instance, ast);
+const collectEvaluatedItems = (cond, instance, ast, dynamicAnchors) => {
+  const tupleLength = Core.collectEvaluatedItems(cond[0], instance, ast, dynamicAnchors);
   const branch = typeof tupleLength === "number" ? 1 : 2;
 
   if (conditional[branch]) {
-    const branchTupleLength = Core.collectEvaluatedItems(conditional[branch], instance, ast);
+    const branchTupleLength = Core.collectEvaluatedItems(conditional[branch], instance, ast, dynamicAnchors);
     return branchTupleLength !== false && Math.max(tupleLength, branchTupleLength);
   } else {
     return tupleLength || 0;
