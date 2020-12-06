@@ -235,6 +235,9 @@ more limited functionality.
 * **Instance.value**: (doc: IDoc) => any
 
     The portion of the instance that the document's JSON Pointer points to.
+* **Instance.has**: (key: string, doc: IDoc) => any
+
+    Similar to `key in instance`.
 * **Instance.typeOf**: (doc: IDoc, type: string) => boolean
 
     Determines if the JSON type of the given doc matches the given type.
