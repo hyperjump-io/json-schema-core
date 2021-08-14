@@ -3,6 +3,10 @@
   "version": "0.21.1",
   "description": "A framework for building JSON Schema tools",
   "main": "lib/index.js",
+  "exports": {
+    "require": "./lib/index.js",
+    "import": "./lib/index.mjs"
+  },
   "browser": {
     "./lib/fetch.js": "./lib/fetch.browser.js"
   },
