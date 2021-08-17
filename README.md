@@ -15,6 +15,8 @@ It includes tools for:
 JSC is designed to run in a vanilla node.js environment, but has no dependencies
 on node.js specific libraries so it can be bundled for the browser. No
 compilers, preprocessors, or bundlers are used.
+JSC includes support for node.js JavaScript (CommonJS and ES Modules),
+TypeScript, and browsers.
 
 ### Node.js
 ```bash
@@ -108,7 +110,7 @@ const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 // Example: Inline schema with external identifier
 const schemaJson = {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "string"
 }
 Schema.add(schemaJson, "http://example.com/schemas/string");
@@ -116,7 +118,7 @@ const schema = await Schema.get("http://example.com/schemas/string");
 
 // Example: Inline schema with internal identifier
 const schemaJson = {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/schemas/string",
   "type": "string"
 }
@@ -125,14 +127,14 @@ const schema = await Schema.get("http://example.com/schemas/string");
 
 // Example: Inline schema with no identifier
 const schemaJson = {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "string"
 }
 Schema.add(schemaJson); // Error: Couldn't determine an identifier for the schema
 
 // Given the following schema at http://example.com/schemas/foo
 // {
-//  "$schema": "https://json-schema.org/draft/2019-09/schema",
+//  "$schema": "https://json-schema.org/draft/2020-12/schema",
 //  "$id": "http://example.com/schemas/string",
 //  "type": "string"
 // }
@@ -145,7 +147,7 @@ const schema = await Schema.get("http://example.com/schemas/foo");
 
 // Given the following schema at http://example.com/schemas/bar
 // {
-//  "$schema": "https://json-schema.org/draft/2019-09/schema",
+//  "$schema": "https://json-schema.org/draft/2020-12/schema",
 //  "$id": "string",
 //  "type": "string"
 // }
@@ -155,7 +157,7 @@ const schema = await Schema.get("http://example.com/schemas/string");
 
 // Given the following schema at /path/to/my/schemas/string.schema.json
 // {
-//  "$schema": "https://json-schema.org/draft/2019-09/schema",
+//  "$schema": "https://json-schema.org/draft/2020-12/schema",
 //  "type": "string"
 // }
 
@@ -164,13 +166,13 @@ const schema = await Schema.get("file:///path/to/my/schemas/string.schema.json")
 
 // Given the following schema at /path/to/my/schemas/string.schema.json
 // {
-//  "$schema": "https://json-schema.org/draft/2019-09/schema",
+//  "$schema": "https://json-schema.org/draft/2020-12/schema",
 //  "type": "string"
 // }
 //
 // Given the following schema at http://example.com/schemas/baz
 // {
-//  "$schema": "https://json-schema.org/draft/2019-09/schema",
+//  "$schema": "https://json-schema.org/draft/2020-12/schema",
 //  "$ref": "file:///path/to/my/schemas/string.schema.json"
 // }
 
@@ -190,7 +192,7 @@ draft is specified in `Schema.add` and the schema has a `$schema`, the
 ```javascript
 // Example: Internal schema version
 const schemaJSON = {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/schemas/string",
   "type": "string"
 };
@@ -200,7 +202,7 @@ Schema.add(schemaJSON);
 const schemaJSON = {
   "type": "string"
 };
-Schema.add(schemaJSON, "http://example.com/schemas/string", "https://json-schema.org/draft/2019-09/schema");
+Schema.add(schemaJSON, "http://example.com/schemas/string", "https://json-schema.org/draft/2020-12/schema");
 
 // Example: No schema version
 const schemaJSON = {
@@ -287,7 +289,7 @@ const { Core, Schema } = require("@hyperjump/json-schema-core");
 // Example: Inline schema with external identifier
 Schema.add({
   "$id": "http://example.com/schemas/string",
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
@@ -310,8 +312,8 @@ const result = Core.interpret(compiledSchema, Instance.cons("foo"));
 
 ## Output
 JSC supports all of the standard output formats specified for JSON Schema
-draft-2019-09 and is separately configurable for instance validation and
-meta-validtion.
+draft 2019-09 and 2020-12 and is separately configurable for instance validation
+and meta-validtion.
 
 This implementation does not include the suggested `keywordLocation` property in
 the output unit. I think `absoluteKeywordLocation`+`instanceLocation` is
@@ -351,20 +353,20 @@ const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 // Example: Specify instance validation output format
 Schema.add({
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/schemas/string",
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
 const isString = await Core.validate(schema);
 const output = isString(42, Core.BASIC); // => {
-//   "keyword": "https://json-schema.org/draft/2019-09/schema",
+//   "keyword": "https://json-schema.org/draft/2020-12/schema",
 //   "absoluteKeywordLocation": "http://example.com/schemas/string#",
 //   "instanceLocation": "#",
 //   "valid": false,
 //   "errors": [
 //     {
-//       "keyword": "https://json-schema.org/draft/2019-09/schema#type",
+//       "keyword": "https://json-schema.org/draft/2020-12/schema#type",
 //       "absoluteKeywordLocation": "http://example.com/schemas/string#/type",
 //       "instanceLocation": "#",
 //       "valid": false
@@ -374,21 +376,21 @@ const output = isString(42, Core.BASIC); // => {
 
 // Example: Specify meta-validation output format
 Schema.add({
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/schemas/foo",
   "type": "this-is-not-a-valid-type"
 });
 Core.setMetaOutputFormat(Core.BASIC);
 const schema = await Schema.get("http://example.com/schemas/foo");
 const isString = await Core.validate(schema); // InvalidSchemaError: {
-//   "keyword": "https://json-schema.org/draft/2019-09/schema",
-//   "absoluteKeywordLocation": "https://json-schema.org/draft/2019-09/schema#",
+//   "keyword": "https://json-schema.org/draft/2020-12/schema",
+//   "absoluteKeywordLocation": "https://json-schema.org/draft/2020-12/schema#",
 //   "instanceLocation": "#",
 //   "valid": false,
 //   "errors": [
 //     {
-//       "keyword": "https://json-schema.org/draft/2019-09/schema#allOf",
-//       "absoluteKeywordLocation": "https://json-schema.org/draft/2019-09/schema#/allOf",
+//       "keyword": "https://json-schema.org/draft/2020-12/schema#allOf",
+//       "absoluteKeywordLocation": "https://json-schema.org/draft/2020-12/schema#/allOf",
 //       "instanceLocation": "#",
 //       "valid": false
 //     }
@@ -415,7 +417,7 @@ const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
 Schema.add({
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/schemas/string",
   "type": "string"
 });
@@ -430,13 +432,13 @@ isString(42);
 PubSub.unsubscribe(subscriptionToken);
 results; // => [
 //   {
-//     "keyword": "https://json-schema.org/draft/2019-09/schema",
+//     "keyword": "https://json-schema.org/draft/2020-12/schema",
 //     "absoluteKeywordLocation": "http://example.com/schemas/string#",
 //     "instanceLocation": "#",
 //     "valid": false
 //   },
 //   {
-//     "keyword": "https://json-schema.org/draft/2019-09/schema#type",
+//     "keyword": "https://json-schema.org/draft/2020-12/schema#type",
 //     "absoluteKeywordLocation": "http://example.com/schemas/string#/type",
 //     "instanceLocation": "#",
 //     "valid": false
@@ -493,7 +495,7 @@ const { Schema } = require("@hyperjump/json-schema-core");
 // Configure draft-04/6/7 style references
 Schema.setConfig("http://json-schema.org/draft-04/schema", "jrefToken", "$ref");
 
-// Configure draft-2019-09 style references
+// Configure draft-2019-09+ style references
 Core.defineVocabulary("https://example.com/draft/custom/vocab/core", {
   "$ref": Keywords.ref,
   "$dynamicRef": Keywords.dynamicRef,
@@ -511,15 +513,15 @@ you want to support.
 
 * **$id**: *(draft-06/07)* Same as `id`, just a different name.
 
-* **$id**: *(draft-2019-09)* Same as `$id` except with same-document reference
+* **$id**: *(draft-2019-09+)* Same as `$id` except with same-document reference
   support split out into `$anchor`.
 
-* **$anchor**: *(draft-2019-09)* Same-document reference.
+* **$anchor**: *(draft-2019-09+)* Same-document reference.
 
 * **$recursiveAnchor**: *(draft-2019-09)* Dynamic scope same-document reference.
   Value is a boolean that is only allowed at the root of a schema.
 
-* **$dynamicAnchor**: *(draft-2019-09)* Dynamic scope same-document reference.
+* **$dynamicAnchor**: *(draft-2020-12)* Dynamic scope same-document reference.
   Value is a string and works like `$anchor`.
 
 In draft-2019-09, `$id` was redefined from being a resolution scope modifier to
@@ -537,11 +539,11 @@ it's not expected to. This is unlikely, but not impossible.
 const { Schema } = require("@hyperjump/json-schema-core");
 
 
-// Configure draft-2019-09 style identifiers
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "baseToken", "$id");
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "embeddedToken", "$id");
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "anchorToken", "$anchor");
-Schema.setConfig("https://json-schema.org/draft/2019-09/schema", "recursiveAnchorToken", "$recursiveAnchor");
+// Configure draft-2019-09+ style identifiers
+Schema.setConfig("https://json-schema.org/draft/2020-12/schema", "baseToken", "$id");
+Schema.setConfig("https://json-schema.org/draft/2002-12/schema", "embeddedToken", "$id");
+Schema.setConfig("https://json-schema.org/draft/2020-12/schema", "anchorToken", "$anchor");
+Schema.setConfig("https://json-schema.org/draft/2020-12/schema", "recursiveAnchorToken", "$recursiveAnchor");
 
 // Configure draft-06/7 style references
 Schema.setConfig("http://json-schema.org/draft-04/schema", "baseToken", "$id");
@@ -566,15 +568,15 @@ const { Core, Schema } = require("@hyperjump/json-schema-core");
 // Optional: Load your meta-schema. If you don't do this, JSC will fetch it
 // using it's identifier when it's needed.
 Schema.add({
-  "$id": "https://example.com/draft/2019-09-strict/schema",
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://example.com/draft/2020-12-strict/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$vocabulary": {
-    "https://json-schema.org/draft/2019-09/vocab/core": true,
-    "https://json-schema.org/draft/2019-09/vocab/applicator": true,
-    "https://json-schema.org/draft/2019-09/vocab/validation": true,
-    "https://json-schema.org/draft/2019-09/vocab/meta-data": true,
-    "https://json-schema.org/draft/2019-09/vocab/format": false,
-    "https://json-schema.org/draft/2019-09/vocab/content": true
+    "https://json-schema.org/draft/2020-12/vocab/core": true,
+    "https://json-schema.org/draft/2020-12/vocab/applicator": true,
+    "https://json-schema.org/draft/2020-12/vocab/validation": true,
+    "https://json-schema.org/draft/2020-12/vocab/meta-data": true,
+    "https://json-schema.org/draft/2020-12/vocab/format-annotation": true,
+    "https://json-schema.org/draft/2020-12/vocab/content": true
   },
   ...
 });
@@ -582,7 +584,7 @@ Schema.add({
 // Use the URI you chose for your meta-schema for the `$schema` in you schemas.
 Schema.add({
   "$id": "http://example.com/schemas/string",
-  "$schema": "http://example.com/draft/2019-09-strict/schema",
+  "$schema": "http://example.com/draft/2020-12-strict/schema",
   "type": "string"
 });
 const schema = await Schema.get("http://example.com/schemas/string");
@@ -637,42 +639,42 @@ the `then` schema, and the third is the `else` schema.
 const { Core, Schema } = require("@hyperjump/json-schema-core");
 
 
-const compile = async (schema, ast, parentSchema) => {
-  const schemas = Schema.map((schema) => Core.compileSchema(schema, ast), cond);
-  return Promise.all(schemas);
-};
+module.exports = {
+  compile: async (schema, ast) => {
+    const schemas = await Schema.map((schema) => Core.compileSchema(schema, ast), schema);
+    return Promise.all(schemas);
+  },
 
-const interpret = (cond, instance, ast, dynamicAnchors) => {
-  return Core.interpretSchema(cond[0], instance, ast, dynamicAnchors)
-    ? (conditional[1] ? Core.interpretSchema(cond[1], instance, ast, dynamicAnchors) : true)
-    : (conditional[2] ? Core.interpretSchema(cond[2], instance, ast, dynamicAnchors) : true);
-};
+  interpret: (cond, instance, ast, dynamicAnchors) => {
+    return Core.interpretSchema(cond[0], instance, ast, dynamicAnchors)
+      ? (cond[1] ? Core.interpretSchema(cond[1], instance, ast, dynamicAnchors) : true)
+      : (cond[2] ? Core.interpretSchema(cond[2], instance, ast, dynamicAnchors) : true);
+  },
 
-const collectEvaluatedProperties = (cond, instance, ast, dynamicAnchors) => {
-  const propertyNames = Core.collectEvaluatedProperties(conditional[0], instance, ast, dynamicAnchors);
-  const branch = propertyNames ? 1 : 2;
+  collectEvaluatedProperties: (cond, instance, ast, dynamicAnchors) => {
+    const propertyNames = Core.collectEvaluatedProperties(cond[0], instance, ast, dynamicAnchors);
+    const branch = propertyNames ? 1 : 2;
 
-  if (conditional[branch]) {
-    const branchPropertyNames = Core.collectEvaluatedProperties(conditional[branch], instance, ast, dynamicAnchors);
-    return branchPropertyNames && (propertyNames || []).concat(branchPropertyNames);
-  } else {
-    return propertyNames || [];
+    if (cond[branch]) {
+      const branchPropertyNames = Core.collectEvaluatedProperties(cond[branch], instance, ast, dynamicAnchors);
+      return branchPropertyNames && (propertyNames || []).concat(branchPropertyNames);
+    } else {
+      return propertyNames || [];
+    }
+  },
+
+  collectEvaluatedItems: (cond, instance, ast, dynamicAnchors) => {
+    const evaluatedIndexes = Core.collectEvaluatedItems(cond[0], instance, ast, dynamicAnchors);
+    const branch = evaluatedIndexes !== false ? 1 : 2;
+
+    if (cond[branch]) {
+      const branchEvaluatedIndexes = Core.collectEvaluatedItems(cond[branch], instance, ast, dynamicAnchors);
+      return branchEvaluatedIndexes !== false && new Set([...evaluatedIndexes || new Set(), ...branchEvaluatedIndexes]);
+    } else {
+      return evaluatedIndexes || new Set();
+    }
   }
 };
-
-const collectEvaluatedItems = (cond, instance, ast, dynamicAnchors) => {
-  const tupleLength = Core.collectEvaluatedItems(cond[0], instance, ast, dynamicAnchors);
-  const branch = typeof tupleLength === "number" ? 1 : 2;
-
-  if (conditional[branch]) {
-    const branchTupleLength = Core.collectEvaluatedItems(conditional[branch], instance, ast, dynamicAnchors);
-    return branchTupleLength !== false && Math.max(tupleLength, branchTupleLength);
-  } else {
-    return tupleLength || 0;
-  }
-};
-
-module.exports = { compile, interpret, collectEvaluatedProperties, collectEvaluatedItems };
 ```
 
 In order to use an keyword in an implementation, you need to add it to a
@@ -699,7 +701,7 @@ Core.defineVocabulary("https://example.com/draft/custom/vocab/conditionals", {
 // Create a new meta-schema an add your vocabulary to `$vocabulary`
 Schema.add({
   "$id": "https://example.com/draft/custom/schema",
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$vocabulary": {
     ...
     "https://example.com/draft/custom/vocab/conditionals": true

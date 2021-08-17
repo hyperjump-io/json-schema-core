@@ -1,6 +1,7 @@
-const { expect } = require("chai");
-const { Given, When, Then } = require("./mocha-gherkin.spec.js");
-const Schema = require("./schema");
+import { expect } from "chai";
+import { Given, When, Then } from "./mocha-gherkin.spec";
+import Schema from "./schema.js";
+import type { SchemaDocument } from "./schema.js";
 
 
 describe("Separate anchor and id", () => {
@@ -28,7 +29,7 @@ describe("Separate anchor and id", () => {
     });
 
     When("retreiving the schema by anchor", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${id}#foo`);
       });
@@ -39,14 +40,10 @@ describe("Separate anchor and id", () => {
     });
 
     When("retreiving the schema by a nonexistent anchor", () => {
-      Then("it should throw an error", async () => {
-        try {
-          await Schema.get(`${id}#bar`);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("it should throw an error", () => {
+        Schema.get(`${id}#bar`)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });
@@ -67,14 +64,10 @@ describe("Separate anchor and id", () => {
     });
 
     When("retreiving the schema by anchor", () => {
-      Then("it should throw an error", async () => {
-        try {
-          await Schema.get(`${testDomain}/foo#foo`);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("it should throw an error", () => {
+        Schema.get(`${testDomain}/foo#foo`)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });

@@ -1,7 +1,8 @@
-const { expect } = require("chai");
-const nock = require("nock");
-const { Given, When, Then } = require("./mocha-gherkin.spec");
-const Schema = require("./schema");
+import { expect } from "chai";
+import nock from "nock";
+import { Given, When, Then } from "./mocha-gherkin.spec";
+import Schema from "./schema.js";
+import type { SchemaDocument } from "./schema.js";
 
 
 const testDomain = "http://test.jsc.hyperjump.io";
@@ -11,38 +12,38 @@ Schema.setConfig(schemaVersion, "idToken", "$id");
 
 describe("Schema.get with files", () => {
   Given("a schema loaded from a file as the context schema", () => {
-    let context;
+    let context: SchemaDocument;
 
     beforeEach(async () => {
       context = await Schema.get(`file://${__dirname}/no-id.fixture.json`);
     });
 
     When("getting a schema using a relative URL", () => {
-      let schema;
+      let schema: SchemaDocument;
 
       beforeEach(async () => {
         schema = await Schema.get("./file-id.fixture.json", context);
       });
 
       Then("it should resolve the relative URL against the context schema's URL and fetch the correct schema", () => {
-        expect(Schema.uri(schema)).to.equal(`file:///path/to/schema/file-id.fixture.json#`);
+        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.fixture.json#");
       });
     });
 
     When("getting a schema using an absolute URL with a 'file' scheme", () => {
-      let schema;
+      let schema: SchemaDocument;
 
       beforeEach(async () => {
         schema = await Schema.get(`file://${__dirname}/file-id.fixture.json`, context);
       });
 
       Then("it should fetch the file", () => {
-        expect(Schema.uri(schema)).to.equal(`file:///path/to/schema/file-id.fixture.json#`);
+        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.fixture.json#");
       });
     });
 
     When("getting a schema using an absolute URL with an 'http' scheme", () => {
-      let schema;
+      let schema: SchemaDocument;
 
       beforeEach(async () => {
         Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
@@ -56,14 +57,14 @@ describe("Schema.get with files", () => {
   });
 
   Given("a schema with an 'http' identifier loaded from a file as the context schema", () => {
-    let context;
+    let context: SchemaDocument;
 
     beforeEach(async () => {
       context = await Schema.get(`file://${__dirname}/http-id.fixture.json`);
     });
 
     When("getting a schema using a relative URL", () => {
-      let schema;
+      let schema: SchemaDocument;
 
       beforeEach(async () => {
         Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
@@ -76,7 +77,7 @@ describe("Schema.get with files", () => {
     });
 
     When("getting a schema using an absolute URL with an 'http' scheme", () => {
-      let schema;
+      let schema: SchemaDocument;
 
       beforeEach(async () => {
         Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
@@ -89,14 +90,10 @@ describe("Schema.get with files", () => {
     });
 
     When("getting a schema using an absolute URL with a 'file' scheme", () => {
-      Then("it should throw an error", async () => {
-        try {
-          await Schema.get(`file://${__dirname}/no-id.fixture.json`, context);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("it should throw an error", () => {
+        Schema.get(`file://${__dirname}/no-id.fixture.json`, context)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });
@@ -111,14 +108,10 @@ describe("Schema.get with files", () => {
           .replyWithFile(200, schemaFilePath);
       });
 
-      Then("it should throw an error", async () => {
-        try {
-          await Schema.get(`${testDomain}/file-id`);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("it should throw an error", () => {
+        Schema.get(`${testDomain}/file-id`)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });

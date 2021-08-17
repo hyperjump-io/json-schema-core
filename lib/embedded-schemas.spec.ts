@@ -1,6 +1,7 @@
-const { expect } = require("chai");
-const { Given, When, Then } = require("./mocha-gherkin.spec.js");
-const Schema = require("./schema");
+import { expect } from "chai";
+import { Given, When, Then } from "./mocha-gherkin.spec";
+import Schema from "./schema.js";
+import type { SchemaDocument } from "./schema.js";
 
 
 describe("Embedded schemas", () => {
@@ -28,7 +29,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/absolute-id`);
       });
@@ -39,7 +40,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema from the root schema", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/root#/definitions/foo`);
       });
@@ -54,7 +55,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving a fragment of the embedded schema from the root schema", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/root#/definitions/foo/type`);
       });
@@ -80,7 +81,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/relative-id`);
       });
@@ -112,7 +113,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/switching-schema-version`);
       });
@@ -145,7 +146,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/switching-id-token`);
       });
@@ -160,7 +161,7 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded anchor", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/switching-id-token#foo`);
       });
@@ -197,14 +198,10 @@ describe("Embedded schemas", () => {
     });
 
     When("retreiving the embedded schema using the embedded anchor", () => {
-      Then("foo", async () => {
-        try {
-          await Schema.get(`${testDomain}/wrong-anchor-token#foo`);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("foo", () => {
+        Schema.get(`${testDomain}/wrong-anchor-token#foo`)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });
