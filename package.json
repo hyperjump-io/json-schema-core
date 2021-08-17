@@ -13,7 +13,7 @@
   "scripts": {
     "clean": "xargs -a .gitignore rm -rf",
     "lint": "eslint lib",
-    "test": "mocha 'lib/**/*.spec.js'",
+    "test": "mocha --require ts-node/register 'lib/**/*.spec.ts'",
     "build": "rollup --config rollup.config.js",
     "prepublishOnly": "npm run build"
   },
@@ -35,25 +35,28 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
-    "@typescript-eslint/eslint-plugin": "^4.29.2",
-    "@typescript-eslint/parser": "^4.29.2",
-    "chai": "^4.2.0",
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^9.0.0",
+    "@types/nock": "^11.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "chai": "^4.3.4",
     "eslint": "^7.32.0",
     "eslint-import-resolver-node": "^0.3.6",
-    "eslint-import-resolver-typescript": "^2.4.0",
-    "eslint-plugin-import": "^2.24.0",
-    "mocha": "^8.2.1",
-    "nock": "^9.6.1",
-    "rollup": "^2.33.1",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.24.2",
+    "mocha": "^9.1.2",
+    "nock": "^13.1.3",
+    "rollup": "^2.57.0",
     "rollup-plugin-terser": "^7.0.2",
-    "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
   },
   "dependencies": {
-    "@hyperjump/json-pointer": "^0.8.0",
-    "@hyperjump/pact": "^0.1.2",
+    "@hyperjump/json-pointer": "^0.9.1",
+    "@hyperjump/pact": "^0.2.0",
     "content-type": "^1.0.4",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.5",
     "pubsub-js": "^1.9.1",
     "url-resolve-browser": "^1.2.0"
   }

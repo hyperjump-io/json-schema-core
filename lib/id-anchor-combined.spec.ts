@@ -1,6 +1,7 @@
-const { expect } = require("chai");
-const { Given, When, Then } = require("./mocha-gherkin.spec.js");
-const Schema = require("./schema");
+import { expect } from "chai";
+import { Given, When, Then } from "./mocha-gherkin.spec";
+import Schema from "./schema.js";
+import type { SchemaDocument } from "./schema.js";
 
 
 describe("Combined anchor and id", () => {
@@ -29,7 +30,7 @@ describe("Combined anchor and id", () => {
     });
 
     When("retreiving the schema by anchor", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${id}#foo`);
       });
@@ -40,14 +41,10 @@ describe("Combined anchor and id", () => {
     });
 
     When("retreiving the schema by a nonexistent anchor", () => {
-      Then("it should throw an error", async () => {
-        try {
-          await Schema.get(`${id}#bar`);
-        } catch (error) {
-          expect(error).to.be.an("error");
-          return;
-        }
-        expect.fail();
+      Then("it should throw an error", () => {
+        Schema.get(`${id}#bar`)
+          .then(() => expect.fail())
+          .catch((error) => expect(error).to.be.an("error"));
       });
     });
   });
@@ -68,7 +65,7 @@ describe("Combined anchor and id", () => {
     });
 
     When("retreiving the schema by anchor", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(`${testDomain}/foo#foo`);
       });

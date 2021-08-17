@@ -1,6 +1,7 @@
-const { expect } = require("chai");
-const { Given, When, Then } = require("./mocha-gherkin.spec.js");
-const Schema = require("./schema");
+import { expect } from "chai";
+import { Given, When, Then } from "./mocha-gherkin.spec";
+import Schema from "./schema.js";
+import type { SchemaDocument } from "./schema.js";
 
 
 const testDomain = "http://test.jsc.hyperjump.io";
@@ -10,8 +11,8 @@ Schema.setConfig(schemaVersion, "baseToken", "$id");
 describe("Identifiers", () => {
   Given("neither an internalId nor an externalId", () => {
     When("adding the schema", () => {
-      let subject;
-      beforeEach(async () => {
+      let subject: () => SchemaDocument;
+      beforeEach(() => {
         subject = () => Schema.add({ "$schema": schemaVersion });
       });
 
@@ -23,8 +24,8 @@ describe("Identifiers", () => {
 
   Given("an internalId with a fragment and an externalId with a fragment", () => {
     When("adding the schema", () => {
-      let subject;
-      beforeEach(async () => {
+      let subject: () => SchemaDocument;
+      beforeEach(() => {
         subject = () => Schema.add({ "$id": "#/foo", "$schema": schemaVersion }, "#/bar");
       });
 
@@ -41,7 +42,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's external id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(externalId);
       });
@@ -59,7 +60,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's internal id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(internalId);
       });
@@ -78,7 +79,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's internal id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(internalId);
       });
@@ -89,7 +90,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's external id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(externalId);
       });
@@ -108,7 +109,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's internal id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(internalId);
       });
@@ -119,7 +120,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's external id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(externalId);
       });
@@ -139,7 +140,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's internal id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(id);
       });
@@ -150,7 +151,7 @@ describe("Identifiers", () => {
     });
 
     When("retrieving the schema by it's external id", () => {
-      let subject;
+      let subject: SchemaDocument;
       beforeEach(async () => {
         subject = await Schema.get(externalId);
       });
