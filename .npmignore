@@ -1,6 +1,7 @@
 .github/
 rollup.config.js
 .eslintrc.json
-**/*.spec.js
+**/*.spec.ts
 **/*.fixture.json
 TODO.md
+tsconfig.json
