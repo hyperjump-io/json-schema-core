@@ -11,7 +11,7 @@ Schema.setConfig(schemaVersion, "baseToken", "$id");
 describe("Identifiers", () => {
   Given("neither an internalId nor an externalId", () => {
     When("adding the schema", () => {
-      let subject: () => SchemaDocument;
+      let subject: () => string;
       beforeEach(() => {
         subject = () => Schema.add({ "$schema": schemaVersion });
       });
@@ -24,7 +24,7 @@ describe("Identifiers", () => {
 
   Given("an internalId with a fragment and an externalId with a fragment", () => {
     When("adding the schema", () => {
-      let subject: () => SchemaDocument;
+      let subject: () => string;
       beforeEach(() => {
         subject = () => Schema.add({ "$id": "#/foo", "$schema": schemaVersion }, "#/bar");
       });

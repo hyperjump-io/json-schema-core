@@ -4,7 +4,7 @@ import type { JsonType } from "./common";
 export type Schema = {
   setConfig: <A>(schemaVersion: Dialect, key: string, value: A) => void;
   getConfig: <A>(schemaVersion: Dialect, key: string) => A;
-  add: <A extends SchemaObject | boolean>(schema: A, url?: string, defaultSchemaVersion?: Dialect) => SchemaDocument;
+  add: <A extends SchemaObject | boolean>(schema: A, url?: string, defaultSchemaVersion?: Dialect) => string;
   get: (uri: string, context?: SchemaDocument) => Promise<SchemaDocument>;
   markValidated: (id: string) => void;
   uri: (doc: SchemaDocument) => string;

@@ -46,9 +46,10 @@ pointer points to. This allows an SDoc to represent any value in the schema
 while maintaining enough context to follow `$ref`s and track the position in the
 document.
 
-* **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => undefined
+* **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => URI
 
-    Load a schema. See the "$id" and "$schema" sections for more details
+    Load a schema. Returns the identifier for the schema. See the "$id" and
+    "$schema" sections for more details.
 * **Schema.get**: (url: URI, contextDoc?: SDoc) => Promise<SDoc>
 
     Fetch a schema. Schemas can come from an HTTP request, a file, or a schema
