@@ -1,7 +1,6 @@
 import type { Core as CoreType } from "./core";
 import type { Schema as SchemaType } from "./schema";
 import type { Instance as InstanceType } from "./instance";
-import type { InvalidSchemaError as InvalidSchemaErrorType } from "./invalid-schema-error";
 import type { Vocabulary } from "./keywords";
 
 
@@ -9,7 +8,6 @@ export const Core: CoreType;
 export const Schema: SchemaType;
 export const Instance: InstanceType;
 export const Keywords: Vocabulary;
-export const InvalidSchemaError: InvalidSchemaErrorType;
 
 export * from "./common";
 export * from "./core";
