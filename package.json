@@ -58,6 +58,7 @@
     "content-type": "^1.0.4",
     "node-fetch": "^2.6.5",
     "pubsub-js": "^1.9.1",
+    "relateurl": "^0.2.7",
     "url-resolve-browser": "^1.2.0"
   }
 }

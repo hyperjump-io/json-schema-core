@@ -85,6 +85,18 @@ document.
 * **Schema.length**: (doc: SDoc) => number
 
     Similar to `Array.prototype.length`.
+* **Schema.toSchema**: (doc: SDoc, options: ToSchemaOptions) => object
+
+    Convert an SDoc back to a schema.
+* **ToSchemaOptions**: (doc: SDoc, options: ToSchemaOptions) => object
+
+    parentId: string (default: "") -- We never want to include local file paths
+    when using file based URIs, so this option allows us to to create relative
+    URIs based on this URI.
+    parentSchema: string (default: "") -- If this value matches the dialect of
+    the schema, the `$schema` keyword will be omitted.
+    includeEmbedded: boolean (default: true) -- If false, embedded schemas will
+    be removed and only the root schema resource will be returned.
 
 ### Schema Identification
 JSC requires that all schemas are identified by at least one URI. There are two
