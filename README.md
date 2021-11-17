@@ -85,6 +85,17 @@ document.
 * **Schema.length**: (doc: SDoc) => number
 
     Similar to `Array.prototype.length`.
+* **Schema.toSchema**: (doc: SDoc, options: ToSchemaOptions) => object
+
+    Get a raw schema from a Schema Document.
+* **ToSchemaOptions**: object
+
+    * parentId: string (default: "") -- `file://` URIs will be generated
+      relative to this path.
+    * parentDialect: string (default: "") -- If the dialect of the schema
+    * matches this value, the `$schema` keyword will be omitted.
+    * includeEmbedded: boolean (default: true) -- If false, embedded schemas
+      will be unbundled from the schema.
 
 ### Schema Identification
 JSC requires that all schemas are identified by at least one URI. There are two
