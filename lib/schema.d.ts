@@ -37,10 +37,17 @@ export type Schema = {
     <A>(fn: MapFn<A>) => (doc: SchemaDocument) => Promise<A[]>
   );
   length: (doc: SchemaDocument) => number;
+  toSchema: (doc: SchemaDocument, options: ToSchemaOptions) => SchemaObject;
 };
 
 type MapFn<A> = (element: SchemaDocument, index: number) => A;
 export type SchemaEntry = [string, SchemaDocument];
+
+export type ToSchemaOptions = {
+  parentId?: string;
+  parentDialect?: string;
+  includeEmbedded?: boolean;
+};
 
 export type SchemaDocument<A extends SchemaFragment = SchemaFragment> = {
   id: string;
