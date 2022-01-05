@@ -161,4 +161,22 @@ describe("Identifiers", () => {
       });
     });
   });
+
+  Given("a schema with IRI internal id only", () => {
+    const internalId = `http://examplé.org/rosé`;
+    beforeEach(() => {
+      Schema.add({ "$id": internalId, "$schema": schemaVersion });
+    });
+
+    When("retrieving the schema by it's internal id", () => {
+      let subject: SchemaDocument;
+      beforeEach(async () => {
+        subject = await Schema.get(internalId);
+      });
+
+      Then("the schema's URI should match the given internal id", () => {
+        expect(Schema.uri(subject)).to.equal(`${internalId}#`);
+      });
+    });
+  });
 });
