@@ -6,9 +6,9 @@ import type { SchemaDocument } from "./schema.js";
 
 
 const testDomain = "http://test.jsc.hyperjump.io";
-const schemaVersion = `${testDomain}/draft-test/schema`;
+const dialectId = `${testDomain}/draft-test/schema`;
 
-Schema.setConfig(schemaVersion, "baseToken", "$id");
+Schema.setConfig(dialectId, "baseToken", "$id");
 
 describe("Schema.get with files", () => {
   Given("a schema loaded from a file as the context schema", () => {
@@ -46,7 +46,7 @@ describe("Schema.get with files", () => {
       let schema: SchemaDocument;
 
       beforeEach(async () => {
-        Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
+        Schema.add({ "$id": `${testDomain}/foo`, "$schema": dialectId });
         schema = await Schema.get(`${testDomain}/foo`, context);
       });
 
@@ -67,7 +67,7 @@ describe("Schema.get with files", () => {
       let schema: SchemaDocument;
 
       beforeEach(async () => {
-        Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
+        Schema.add({ "$id": `${testDomain}/foo`, "$schema": dialectId });
         schema = await Schema.get("./foo", context);
       });
 
@@ -80,7 +80,7 @@ describe("Schema.get with files", () => {
       let schema: SchemaDocument;
 
       beforeEach(async () => {
-        Schema.add({ "$id": `${testDomain}/foo`, "$schema": schemaVersion });
+        Schema.add({ "$id": `${testDomain}/foo`, "$schema": dialectId });
         schema = await Schema.get(`${testDomain}/foo`, context);
       });
 

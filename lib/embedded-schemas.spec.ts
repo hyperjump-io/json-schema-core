@@ -6,19 +6,19 @@ import type { SchemaDocument } from "./schema.js";
 
 describe("Embedded schemas", () => {
   const testDomain = "http://test.jsc.hyperjump.io";
-  const schemaVersion = `${testDomain}/draft-test/schema`;
+  const dialectId = `${testDomain}/draft-test/schema`;
 
   before(() => {
-    Schema.setConfig(schemaVersion, "baseToken", "$id");
-    Schema.setConfig(schemaVersion, "embeddedToken", "$id");
-    Schema.setConfig(schemaVersion, "anchorToken", "$anchor");
+    Schema.setConfig(dialectId, "baseToken", "$id");
+    Schema.setConfig(dialectId, "embeddedToken", "$id");
+    Schema.setConfig(dialectId, "anchorToken", "$anchor");
   });
 
   Given("an embedded schema with an absolute URI", () => {
     beforeEach(() => {
       Schema.add({
         "$id": `${testDomain}/root`,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": `${testDomain}/absolute-id`,
@@ -49,8 +49,8 @@ describe("Embedded schemas", () => {
         expect(Schema.uri(subject)).to.equal(`${testDomain}/absolute-id#`);
       });
 
-      Then("it's schemaVersion should be inherited from the embedded URI", () => {
-        expect(subject.schemaVersion).to.equal(schemaVersion);
+      Then("it's dialectId should be inherited from the embedded URI", () => {
+        expect(subject.dialectId).to.equal(dialectId);
       });
     });
 
@@ -70,7 +70,7 @@ describe("Embedded schemas", () => {
     beforeEach(() => {
       Schema.add({
         "$id": `${testDomain}/root`,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": "relative-id",
@@ -92,7 +92,7 @@ describe("Embedded schemas", () => {
     });
   });
 
-  Given("an embedded schema with a different schemaVersion than the parent schema", () => {
+  Given("an embedded schema with a different dialectId than the parent schema", () => {
     const embeddedSchemaVersion = `${testDomain}/draft-embedded/schema`;
 
     beforeEach(() => {
@@ -101,7 +101,7 @@ describe("Embedded schemas", () => {
 
       Schema.add({
         "$id": `${testDomain}/root`,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": `${testDomain}/switching-schema-version`,
@@ -118,8 +118,8 @@ describe("Embedded schemas", () => {
         subject = await Schema.get(`${testDomain}/switching-schema-version`);
       });
 
-      Then("it's schemaVersion should change to the embedded schema", () => {
-        expect(subject.schemaVersion).to.equal(embeddedSchemaVersion);
+      Then("it's dialectId should change to the embedded schema", () => {
+        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
       });
     });
   });
@@ -134,7 +134,7 @@ describe("Embedded schemas", () => {
 
       Schema.add({
         "$id": `${testDomain}/root`,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "id": `${testDomain}/switching-id-token#foo`,
@@ -155,8 +155,8 @@ describe("Embedded schemas", () => {
         expect(Schema.uri(subject)).to.equal(`${testDomain}/switching-id-token#`);
       });
 
-      Then("it's schemaVersion should change to the embedded schema", () => {
-        expect(subject.schemaVersion).to.equal(embeddedSchemaVersion);
+      Then("it's dialectId should change to the embedded schema", () => {
+        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
       });
     });
 
@@ -170,8 +170,8 @@ describe("Embedded schemas", () => {
         expect(Schema.uri(subject)).to.equal(`${testDomain}/switching-id-token#`);
       });
 
-      Then("it's schemaVersion should change to the embedded schema", () => {
-        expect(subject.schemaVersion).to.equal(embeddedSchemaVersion);
+      Then("it's dialectId should change to the embedded schema", () => {
+        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
       });
     });
   });
@@ -185,7 +185,7 @@ describe("Embedded schemas", () => {
 
       Schema.add({
         "$id": `${testDomain}/root`,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "id": `${testDomain}/wrong-anchor-token`,

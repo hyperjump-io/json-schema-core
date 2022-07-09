@@ -2,8 +2,8 @@ import type { JsonType } from "./common";
 
 
 export type Schema = {
-  setConfig: <A>(schemaVersion: Dialect, key: string, value: A) => void;
-  getConfig: <A>(schemaVersion: Dialect, key: string) => A;
+  setConfig: <A>(dialectId: Dialect, key: string, value: A) => void;
+  getConfig: <A>(dialectId: Dialect, key: string) => A;
   add: <A extends SchemaObject | boolean>(schema: A, url?: string, defaultSchemaVersion?: Dialect) => string;
   get: (uri: string, context?: SchemaDocument) => Promise<SchemaDocument>;
   markValidated: (id: string) => void;
@@ -51,7 +51,7 @@ export type ToSchemaOptions = {
 
 export type SchemaDocument<A extends SchemaFragment = SchemaFragment> = {
   id: string;
-  schemaVersion: Dialect;
+  dialectId: Dialect;
   pointer: string;
   schema: SchemaObject;
   value: A;

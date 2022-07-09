@@ -6,12 +6,12 @@ import type { SchemaDocument } from "./schema.js";
 
 describe("Combined anchor and id", () => {
   const testDomain = "http://test.jsc.hyperjump.io";
-  const schemaVersion = `${testDomain}/draft-test/schema`;
+  const dialectId = `${testDomain}/draft-test/schema`;
 
   before(() => {
-    Schema.setConfig(schemaVersion, "baseToken", "$id");
-    Schema.setConfig(schemaVersion, "embeddedToken", "$id");
-    Schema.setConfig(schemaVersion, "anchorToken", "$id");
+    Schema.setConfig(dialectId, "baseToken", "$id");
+    Schema.setConfig(dialectId, "embeddedToken", "$id");
+    Schema.setConfig(dialectId, "anchorToken", "$id");
   });
 
   Given("A schema with an anchor id", () => {
@@ -19,7 +19,7 @@ describe("Combined anchor and id", () => {
     beforeEach(() => {
       Schema.add({
         "$id": id,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": "#foo",
@@ -54,7 +54,7 @@ describe("Combined anchor and id", () => {
     beforeEach(() => {
       Schema.add({
         "$id": id,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": "foo#foo",

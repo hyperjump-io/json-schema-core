@@ -5,15 +5,15 @@ import type { SchemaDocument } from "./schema.js";
 
 
 const testDomain = "http://test.jsc.hyperjump.io";
-const schemaVersion = `${testDomain}/draft-test/schema`;
-Schema.setConfig(schemaVersion, "baseToken", "$id");
+const dialectId = `${testDomain}/draft-test/schema`;
+Schema.setConfig(dialectId, "baseToken", "$id");
 
 describe("Identifiers", () => {
   Given("neither an internalId nor an externalId", () => {
     When("adding the schema", () => {
       let subject: () => string;
       beforeEach(() => {
-        subject = () => Schema.add({ "$schema": schemaVersion });
+        subject = () => Schema.add({ "$schema": dialectId });
       });
 
       Then("it should throw an error", () => {
@@ -26,7 +26,7 @@ describe("Identifiers", () => {
     When("adding the schema", () => {
       let subject: () => string;
       beforeEach(() => {
-        subject = () => Schema.add({ "$id": "#/foo", "$schema": schemaVersion }, "#/bar");
+        subject = () => Schema.add({ "$id": "#/foo", "$schema": dialectId }, "#/bar");
       });
 
       Then("it should throw an error", () => {
@@ -38,7 +38,7 @@ describe("Identifiers", () => {
   Given("a schema with external id only", () => {
     const externalId = `${testDomain}/external-id`;
     beforeEach(() => {
-      Schema.add({ "$schema": schemaVersion }, externalId);
+      Schema.add({ "$schema": dialectId }, externalId);
     });
 
     When("retrieving the schema by it's external id", () => {
@@ -56,7 +56,7 @@ describe("Identifiers", () => {
   Given("a schema with internal id only", () => {
     const internalId = `${testDomain}/internal-id`;
     beforeEach(() => {
-      Schema.add({ "$id": internalId, "$schema": schemaVersion });
+      Schema.add({ "$id": internalId, "$schema": dialectId });
     });
 
     When("retrieving the schema by it's internal id", () => {
@@ -75,7 +75,7 @@ describe("Identifiers", () => {
     const internalId = `${testDomain}/internal-id`;
     const externalId = `${testDomain}/external-id`;
     beforeEach(() => {
-      Schema.add({ "$id": internalId, "$schema": schemaVersion }, externalId);
+      Schema.add({ "$id": internalId, "$schema": dialectId }, externalId);
     });
 
     When("retrieving the schema by it's internal id", () => {
@@ -105,7 +105,7 @@ describe("Identifiers", () => {
     const internalId = `${testDomain}/internal-id`;
     const externalId = `${testDomain}/external-id`;
     beforeEach(() => {
-      Schema.add({ "$id": `${internalId}#/foo`, "$schema": schemaVersion }, `${externalId}#/bar`);
+      Schema.add({ "$id": `${internalId}#/foo`, "$schema": dialectId }, `${externalId}#/bar`);
     });
 
     When("retrieving the schema by it's internal id", () => {
@@ -136,7 +136,7 @@ describe("Identifiers", () => {
     const externalId = `${testDomain}/external-id`;
     const id = `${testDomain}/internal-id`;
     beforeEach(() => {
-      Schema.add({ "$id": internalId, "$schema": schemaVersion }, externalId);
+      Schema.add({ "$id": internalId, "$schema": dialectId }, externalId);
     });
 
     When("retrieving the schema by it's internal id", () => {
@@ -165,7 +165,7 @@ describe("Identifiers", () => {
   Given("a schema with IRI internal id only", () => {
     const internalId = `http://examplé.org/rosé`;
     beforeEach(() => {
-      Schema.add({ "$id": internalId, "$schema": schemaVersion });
+      Schema.add({ "$id": internalId, "$schema": dialectId });
     });
 
     When("retrieving the schema by it's internal id", () => {

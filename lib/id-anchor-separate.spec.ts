@@ -6,11 +6,11 @@ import type { SchemaDocument } from "./schema.js";
 
 describe("Separate anchor and id", () => {
   const testDomain = "http://test.jsc.hyperjump.io";
-  const schemaVersion = `${testDomain}/draft-test/schema`;
+  const dialectId = `${testDomain}/draft-test/schema`;
 
   before(() => {
-    Schema.setConfig(schemaVersion, "baseToken", "$id");
-    Schema.setConfig(schemaVersion, "anchorToken", "$anchor");
+    Schema.setConfig(dialectId, "baseToken", "$id");
+    Schema.setConfig(dialectId, "anchorToken", "$anchor");
   });
 
   Given("A schema with an anchor", () => {
@@ -18,7 +18,7 @@ describe("Separate anchor and id", () => {
     beforeEach(() => {
       Schema.add({
         "$id": id,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$anchor": "foo",
@@ -53,7 +53,7 @@ describe("Separate anchor and id", () => {
     beforeEach(() => {
       Schema.add({
         "$id": id,
-        "$schema": schemaVersion,
+        "$schema": dialectId,
         "definitions": {
           "foo": {
             "$id": "foo#foo",

@@ -46,7 +46,7 @@ pointer points to. This allows an SDoc to represent any value in the schema
 while maintaining enough context to follow `$ref`s and track the position in the
 document.
 
-* **Schema.add**: (schema: object, url?: URI, schemaVersion?: string) => URI
+* **Schema.add**: (schema: object, url?: URI, dialectId?: string) => URI
 
     Load a schema. Returns the identifier for the schema. See the "$id" and
     "$schema" sections for more details.
@@ -469,12 +469,12 @@ In addition to this documentation you should be able to look at the
 example of how to add your custom plugins because it's all implemented the same
 way.
 
-* **Schema.setConfig**: (schemaVersion: string, configName: string, configValue: string) => undefined
+* **Schema.setConfig**: (jsonSchemaVersion: string, configName: string, configValue: string) => undefined
 
-    Set a configuration value for a schemaVersion.
-* **Schema.getConfig**: (schemaVersion: string, configName: string) => any
+    Set a configuration value for a JSON Schema version.
+* **Schema.getConfig**: (dialectId: string, configName: string) => any
 
-    Get a configuration value for a schemaVersion.
+    Get a configuration value for a dialect.
 
 ### References
 The `$ref` keyword has changed a couple times over the last several drafts. JSC
