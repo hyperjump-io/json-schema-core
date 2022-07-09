@@ -9,7 +9,7 @@ describe("Separate anchor and id", () => {
   const schemaVersion = `${testDomain}/draft-test/schema`;
 
   before(() => {
-    Schema.setConfig(schemaVersion, "idToken", "$id");
+    Schema.setConfig(schemaVersion, "baseToken", "$id");
     Schema.setConfig(schemaVersion, "anchorToken", "$anchor");
   });
 

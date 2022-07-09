@@ -8,7 +8,7 @@ import type { SchemaDocument } from "./schema.js";
 const testDomain = "http://test.jsc.hyperjump.io";
 const schemaVersion = `${testDomain}/draft-test/schema`;
 
-Schema.setConfig(schemaVersion, "idToken", "$id");
+Schema.setConfig(schemaVersion, "baseToken", "$id");
 
 describe("Schema.get with files", () => {
   Given("a schema loaded from a file as the context schema", () => {
