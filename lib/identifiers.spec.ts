@@ -5,8 +5,12 @@ import type { SchemaDocument } from "./schema.js";
 
 
 const testDomain = "http://test.jsc.hyperjump.io";
-const dialectId = `${testDomain}/draft-test/schema`;
+const dialectId = `${testDomain}/dialect/identifiers`;
 Schema.setConfig(dialectId, "baseToken", "$id");
+Schema.add({
+  "$id": dialectId,
+  "$schema": dialectId
+});
 
 describe("Identifiers", () => {
   Given("neither an internalId nor an externalId", () => {

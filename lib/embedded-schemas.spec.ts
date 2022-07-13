@@ -4,14 +4,16 @@ import Schema from "./schema.js";
 import type { SchemaDocument } from "./schema.js";
 
 
-describe("Embedded schemas", () => {
-  const testDomain = "http://test.jsc.hyperjump.io";
-  const dialectId = `${testDomain}/draft-test/schema`;
+const testDomain = "http://test.jsc.hyperjump.io";
 
-  before(() => {
-    Schema.setConfig(dialectId, "baseToken", "$id");
-    Schema.setConfig(dialectId, "embeddedToken", "$id");
-    Schema.setConfig(dialectId, "anchorToken", "$anchor");
+describe("Embedded schemas", () => {
+  const dialectId = `${testDomain}/dialect/embedded-schemas`;
+  Schema.setConfig(dialectId, "baseToken", "$id");
+  Schema.setConfig(dialectId, "embeddedToken", "$id");
+  Schema.setConfig(dialectId, "anchorToken", "$anchor");
+  Schema.add({
+    "$id": dialectId,
+    "$schema": dialectId
   });
 
   Given("an embedded schema with an absolute URI", () => {
@@ -93,23 +95,24 @@ describe("Embedded schemas", () => {
   });
 
   Given("an embedded schema with a different dialectId than the parent schema", () => {
-    const embeddedSchemaVersion = `${testDomain}/draft-embedded/schema`;
+    const embeddedDialectId = `${testDomain}/dialect/embedded-schemas/embedded1`;
+    Schema.setConfig(embeddedDialectId, "baseToken", "$id");
+    Schema.setConfig(embeddedDialectId, "embeddedToken", "$id");
+    Schema.add({
+      "$id": embeddedDialectId,
+      "$schema": embeddedDialectId
+    });
 
-    beforeEach(() => {
-      Schema.setConfig(embeddedSchemaVersion, "baseToken", "$id");
-      Schema.setConfig(embeddedSchemaVersion, "embeddedToken", "$id");
-
-      Schema.add({
-        "$id": `${testDomain}/root`,
-        "$schema": dialectId,
-        "definitions": {
-          "foo": {
-            "$id": `${testDomain}/switching-schema-version`,
-            "$schema": embeddedSchemaVersion,
-            "type": "string"
-          }
+    Schema.add({
+      "$id": `${testDomain}/root`,
+      "$schema": dialectId,
+      "definitions": {
+        "foo": {
+          "$id": `${testDomain}/switching-schema-version`,
+          "$schema": embeddedDialectId,
+          "type": "string"
         }
-      });
+      }
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
@@ -119,30 +122,31 @@ describe("Embedded schemas", () => {
       });
 
       Then("it's dialectId should change to the embedded schema", () => {
-        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
+        expect(subject.dialectId).to.equal(embeddedDialectId);
       });
     });
   });
 
   Given("an embedded schema with a different embeddedToken than the parent schema", () => {
-    const embeddedSchemaVersion = `${testDomain}/draft-embedded/schema`;
+    const embeddedDialectId = `${testDomain}/dialect/embedded-schemas/embedded2`;
+    Schema.setConfig(embeddedDialectId, "baseToken", "id");
+    Schema.setConfig(embeddedDialectId, "embeddedToken", "id");
+    Schema.setConfig(embeddedDialectId, "anchorToken", "id");
+    Schema.add({
+      "id": embeddedDialectId,
+      "$schema": embeddedDialectId
+    });
 
-    beforeEach(() => {
-      Schema.setConfig(embeddedSchemaVersion, "baseToken", "id");
-      Schema.setConfig(embeddedSchemaVersion, "embeddedToken", "id");
-      Schema.setConfig(embeddedSchemaVersion, "anchorToken", "id");
-
-      Schema.add({
-        "$id": `${testDomain}/root`,
-        "$schema": dialectId,
-        "definitions": {
-          "foo": {
-            "id": `${testDomain}/switching-id-token#foo`,
-            "$schema": embeddedSchemaVersion,
-            "type": "string"
-          }
+    Schema.add({
+      "$id": `${testDomain}/root`,
+      "$schema": dialectId,
+      "definitions": {
+        "foo": {
+          "id": `${testDomain}/switching-id-token#foo`,
+          "$schema": embeddedDialectId,
+          "type": "string"
         }
-      });
+      }
     });
 
     When("retreiving the embedded schema using the embedded URI", () => {
@@ -156,7 +160,7 @@ describe("Embedded schemas", () => {
       });
 
       Then("it's dialectId should change to the embedded schema", () => {
-        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
+        expect(subject.dialectId).to.equal(embeddedDialectId);
       });
     });
 
@@ -171,30 +175,31 @@ describe("Embedded schemas", () => {
       });
 
       Then("it's dialectId should change to the embedded schema", () => {
-        expect(subject.dialectId).to.equal(embeddedSchemaVersion);
+        expect(subject.dialectId).to.equal(embeddedDialectId);
       });
     });
   });
 
   Given("an embedded schema with an anchor that should only be understood by the parent", () => {
-    const embeddedSchemaVersion = `${testDomain}/draft-embedded/schema`;
+    const embeddedDialectId = `${testDomain}/dialect/embedded-schemas/embedded3`;
+    Schema.setConfig(embeddedDialectId, "baseToken", "id");
+    Schema.setConfig(embeddedDialectId, "embeddedToken", "id");
+    Schema.add({
+      "id": embeddedDialectId,
+      "$schema": embeddedDialectId
+    });
 
-    beforeEach(() => {
-      Schema.setConfig(embeddedSchemaVersion, "baseToken", "id");
-      Schema.setConfig(embeddedSchemaVersion, "embeddedToken", "id");
-
-      Schema.add({
-        "$id": `${testDomain}/root`,
-        "$schema": dialectId,
-        "definitions": {
-          "foo": {
-            "id": `${testDomain}/wrong-anchor-token`,
-            "$schema": embeddedSchemaVersion,
-            "$anchor": "foo",
-            "type": "string"
-          }
+    Schema.add({
+      "$id": `${testDomain}/root`,
+      "$schema": dialectId,
+      "definitions": {
+        "foo": {
+          "id": `${testDomain}/wrong-anchor-token`,
+          "$schema": embeddedDialectId,
+          "$anchor": "foo",
+          "type": "string"
         }
-      });
+      }
     });
 
     When("retreiving the embedded schema using the embedded anchor", () => {

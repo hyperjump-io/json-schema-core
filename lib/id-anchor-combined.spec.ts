@@ -6,12 +6,16 @@ import type { SchemaDocument } from "./schema.js";
 
 describe("Combined anchor and id", () => {
   const testDomain = "http://test.jsc.hyperjump.io";
-  const dialectId = `${testDomain}/draft-test/schema`;
+  const dialectId = `${testDomain}/dialect/id-anchor-combined`;
 
   before(() => {
     Schema.setConfig(dialectId, "baseToken", "$id");
     Schema.setConfig(dialectId, "embeddedToken", "$id");
     Schema.setConfig(dialectId, "anchorToken", "$id");
+    Schema.add({
+      "$id": dialectId,
+      "$schema": dialectId
+    });
   });
 
   Given("A schema with an anchor id", () => {

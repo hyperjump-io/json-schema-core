@@ -6,11 +6,15 @@ import type { SchemaDocument } from "./schema.js";
 
 describe("Separate anchor and id", () => {
   const testDomain = "http://test.jsc.hyperjump.io";
-  const dialectId = `${testDomain}/draft-test/schema`;
+  const dialectId = `${testDomain}/dialect/id-anchor-separate`;
 
   before(() => {
     Schema.setConfig(dialectId, "baseToken", "$id");
     Schema.setConfig(dialectId, "anchorToken", "$anchor");
+    Schema.add({
+      "$id": dialectId,
+      "$schema": dialectId
+    });
   });
 
   Given("A schema with an anchor", () => {

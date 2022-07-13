@@ -1,4 +1,4 @@
 {
   "$id": "http://test.jsc.hyperjump.io/http-id",
-  "$schema": "http://test.jsc.hyperjump.io/draft-test/schema"
+  "$schema": "http://test.jsc.hyperjump.io/dialect/file-link-security"
 }
