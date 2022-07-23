@@ -193,6 +193,42 @@ const schema = await Schema.get("http://example.com/schemas/baz");
 await Core.validate(schema); // Error: Can't access file resource from network context
 ```
 
+### Media Type Support
+JSC can read schema from the file system or the web, but by default will only
+accept these schemas if they have the proper media type. That's `Content-Type:
+application/schema+json` for web requests and the `.schema.json` file extension
+for files. That behavior can be modified or added to using MediaType plugins.
+
+* **Core.addMediaTypePlugin**: (contentType: string, plugin: MediaTypePlugin) => void
+
+    Add a custom media type handler to support things like YAML or to change the
+    way JSON is supported.
+* **MediaTypePlugin**: object
+
+    * parse: (response: Response) => string -- Given a fetch Response object,
+      parse the body of the request
+    * matcher: (path) => boolean -- Given a filesystem path, return whether or
+      not the file should be considered a member of this media type
+
+```javascript
+Core.addMediaTypePlugin("application/schema+yaml", {
+  parse: async (response) => Yaml.parse(await response.text()),
+  matcher: (path) => path.endsWith(".schema.yaml")
+});
+
+// Given the following schema at http://example.com/schemas/foo
+// $schema: 'https://json-schema.org/draft/2020-12/schema'
+// type: string
+
+const schema = await Schema.get("http://example.com/schemas/string");
+
+// Given the following schema at /path/to/my/schemas/string.schema.yaml
+// $schema: 'https://json-schema.org/draft/2020-12/schema'
+// type: string
+
+const schema = await Schema.get("file:///path/to/my/schemas/string.schema.yaml");
+```
+
 ### $schema
 JSC is designed to support multiple drafts of JSON Schema and it makes no
 assumption about what draft your schema uses. You need to specify it in some

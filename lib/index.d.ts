@@ -11,7 +11,6 @@ export const Instance: InstanceType;
 export const Reference: ReferenceType;
 export const Keywords: Vocabulary;
 
-export * from "./common";
 export * from "./core";
 export * from "./schema";
 export * from "./instance";

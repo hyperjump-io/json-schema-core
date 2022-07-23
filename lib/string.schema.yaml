@@ -1,0 +1,2 @@
+$schema: 'http://test.jsc.hyperjump.io/dialect/yaml-schema'
+type: string

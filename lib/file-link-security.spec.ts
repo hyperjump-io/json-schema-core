@@ -19,18 +19,18 @@ describe("Schema.get with files", () => {
     let context: SchemaDocument;
 
     beforeEach(async () => {
-      context = await Schema.get(`file://${__dirname}/no-id.fixture.json`);
+      context = await Schema.get(`file://${__dirname}/no-id.schema.json`);
     });
 
     When("getting a schema using a relative URL", () => {
       let schema: SchemaDocument;
 
       beforeEach(async () => {
-        schema = await Schema.get("./file-id.fixture.json", context);
+        schema = await Schema.get("./file-id.schema.json", context);
       });
 
       Then("it should resolve the relative URL against the context schema's URL and fetch the correct schema", () => {
-        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.fixture.json#");
+        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.schema.json#");
       });
     });
 
@@ -38,11 +38,11 @@ describe("Schema.get with files", () => {
       let schema: SchemaDocument;
 
       beforeEach(async () => {
-        schema = await Schema.get(`file://${__dirname}/file-id.fixture.json`, context);
+        schema = await Schema.get(`file://${__dirname}/file-id.schema.json`, context);
       });
 
       Then("it should fetch the file", () => {
-        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.fixture.json#");
+        expect(Schema.uri(schema)).to.equal("file:///path/to/schema/file-id.schema.json#");
       });
     });
 
@@ -64,7 +64,7 @@ describe("Schema.get with files", () => {
     let context: SchemaDocument;
 
     beforeEach(async () => {
-      context = await Schema.get(`file://${__dirname}/http-id.fixture.json`);
+      context = await Schema.get(`file://${__dirname}/http-id.schema.json`);
     });
 
     When("getting a schema using a relative URL", () => {
@@ -95,7 +95,7 @@ describe("Schema.get with files", () => {
 
     When("getting a schema using an absolute URL with a 'file' scheme", () => {
       Then("it should throw an error", () => {
-        Schema.get(`file://${__dirname}/no-id.fixture.json`, context)
+        Schema.get(`file://${__dirname}/no-id.schema.json`, context)
           .then(() => expect.fail())
           .catch((error) => expect(error).to.be.an("error"));
       });
@@ -103,7 +103,7 @@ describe("Schema.get with files", () => {
   });
 
   Given("a schema with a 'file' identifier", () => {
-    const schemaFilePath = `${__dirname}/file-id.fixture.json`;
+    const schemaFilePath = `${__dirname}/file-id.schema.json`;
 
     When("the schema is retrieved from http", () => {
       beforeEach(() => {

@@ -16,6 +16,7 @@ export type Core = {
   );
   setMetaOutputFormat: (format: OutputFormat) => void;
   setShouldMetaValidate: (isEnabled: boolean) => void;
+  addMediaTypePlugin: (contentType: string, plugin: MediaTypePlugin) => void;
   FLAG: "FLAG";
   BASIC: "BASIC";
   DETAILED: "DETAILED";
@@ -62,6 +63,11 @@ export type Result = {
   instanceLocation: string;
   valid: boolean;
   errors?: Result[];
+};
+
+export type MediaTypePlugin = {
+  parse: (response: Response) => Promise<SchemaDocument>;
+  matcher: (path: string) => boolean;
 };
 
 declare const core: Core;

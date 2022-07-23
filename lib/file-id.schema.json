@@ -1,4 +1,4 @@
 {
-  "$id": "file:///path/to/schema/file-id.fixture.json",
+  "$id": "file:///path/to/schema/file-id.schema.json",
   "$schema": "http://test.jsc.hyperjump.io/dialect/file-link-security"
 }
