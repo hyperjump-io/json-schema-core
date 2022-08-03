@@ -66,7 +66,7 @@ export type Result = {
 };
 
 export type MediaTypePlugin = {
-  parse: (response: Response) => Promise<SchemaDocument>;
+  parse: (response: Response, mediaTypeParameters: { [parameter: string]: string }) => Promise<[SchemaObject, string | undefined]>;
   matcher: (path: string) => boolean;
 };
 

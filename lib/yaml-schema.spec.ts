@@ -2,7 +2,7 @@ import { expect } from "chai";
 import nock from "nock";
 import { When, Then } from "./mocha-gherkin.spec";
 import Schema from "./schema";
-import type { SchemaDocument } from "./schema";
+import type { SchemaDocument, SchemaObject } from "./schema";
 import Core from "./core";
 import Yaml from "yaml";
 
@@ -11,7 +11,7 @@ const testDomain = "http://test.jsc.hyperjump.io";
 const dialectId = `${testDomain}/dialect/yaml-schema`;
 
 Core.addMediaTypePlugin("application/schema+yaml", {
-  parse: async (response) => Yaml.parse(await response.text()) as SchemaDocument,
+  parse: async (response) => [Yaml.parse(await response.text()) as SchemaObject, undefined],
   matcher: (path) => path.endsWith(".schema.yaml")
 });
 Schema.setConfig(dialectId, "baseToken", "$id");
