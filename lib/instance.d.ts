@@ -4,7 +4,8 @@ import type { Json, JsonObject } from "@hyperjump/json-pointer";
 
 export type Instance = {
   nil: JsonDocument<undefined>;
-  cons: (instance: Json, id?: string) => JsonDocument<typeof instance>;
+  cons: (instance: Json, id?: string) => JsonDocument;
+  get: (uri: string, context?: Instance) => Instance;
   uri: (doc: JsonDocument) => string;
   value: <A extends Json>(doc: JsonDocument<A>) => A;
   has: (key: string, doc: JsonDocument<JsonObject>) => boolean;
@@ -33,6 +34,11 @@ export type Instance = {
   ) & (
     <A>(fn: MapFn<A>) => (doc: JsonDocument<Json[]>) => A[]
   );
+  forEach: (
+    (fn: ForEachFn, doc: JsonDocument<Json[]>) => void
+  ) & (
+    (fn: ForEachFn) => (doc: JsonDocument<Json[]>) => void
+  );
   filter: (
     (fn: FilterFn, doc: JsonDocument<Json[]>) => JsonDocument[]
   ) & (
@@ -59,6 +65,7 @@ export type Instance = {
 };
 
 type MapFn<A> = (element: JsonDocument, index: number) => A;
+type ForEachFn = (element: JsonDocument, index: number) => void;
 type FilterFn = (element: JsonDocument, index: number) => boolean;
 type ReduceFn<A> = (accumulator: A, currentValue: JsonDocument, index: number) => A;
 
