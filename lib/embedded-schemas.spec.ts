@@ -11,10 +11,6 @@ describe("Embedded schemas", () => {
   Schema.setConfig(dialectId, "baseToken", "$id");
   Schema.setConfig(dialectId, "embeddedToken", "$id");
   Schema.setConfig(dialectId, "anchorToken", "$anchor");
-  Schema.add({
-    "$id": dialectId,
-    "$schema": dialectId
-  });
 
   Given("an embedded schema with an absolute URI", () => {
     beforeEach(() => {
@@ -98,10 +94,6 @@ describe("Embedded schemas", () => {
     const embeddedDialectId = `${testDomain}/dialect/embedded-schemas/embedded1`;
     Schema.setConfig(embeddedDialectId, "baseToken", "$id");
     Schema.setConfig(embeddedDialectId, "embeddedToken", "$id");
-    Schema.add({
-      "$id": embeddedDialectId,
-      "$schema": embeddedDialectId
-    });
 
     Schema.add({
       "$id": `${testDomain}/root`,
@@ -132,10 +124,6 @@ describe("Embedded schemas", () => {
     Schema.setConfig(embeddedDialectId, "baseToken", "id");
     Schema.setConfig(embeddedDialectId, "embeddedToken", "id");
     Schema.setConfig(embeddedDialectId, "anchorToken", "id");
-    Schema.add({
-      "id": embeddedDialectId,
-      "$schema": embeddedDialectId
-    });
 
     Schema.add({
       "$id": `${testDomain}/root`,
@@ -184,10 +172,6 @@ describe("Embedded schemas", () => {
     const embeddedDialectId = `${testDomain}/dialect/embedded-schemas/embedded3`;
     Schema.setConfig(embeddedDialectId, "baseToken", "id");
     Schema.setConfig(embeddedDialectId, "embeddedToken", "id");
-    Schema.add({
-      "id": embeddedDialectId,
-      "$schema": embeddedDialectId
-    });
 
     Schema.add({
       "$id": `${testDomain}/root`,

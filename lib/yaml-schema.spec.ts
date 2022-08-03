@@ -15,10 +15,6 @@ Core.addMediaTypePlugin("application/schema+yaml", {
   matcher: (path) => path.endsWith(".schema.yaml")
 });
 Schema.setConfig(dialectId, "baseToken", "$id");
-Schema.add({
-  "$id": dialectId,
-  "$schema": dialectId
-});
 
 describe("Schema.get with YAML", () => {
   When("fetching a YAML schema from the file system", () => {

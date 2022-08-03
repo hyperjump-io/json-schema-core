@@ -11,10 +11,6 @@ describe("Separate anchor and id", () => {
   before(() => {
     Schema.setConfig(dialectId, "baseToken", "$id");
     Schema.setConfig(dialectId, "anchorToken", "$anchor");
-    Schema.add({
-      "$id": dialectId,
-      "$schema": dialectId
-    });
   });
 
   Given("A schema with an anchor", () => {

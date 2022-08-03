@@ -9,10 +9,6 @@ const testDomain = "http://test.jsc.hyperjump.io";
 const dialectId = `${testDomain}/dialect/file-link-security`;
 
 Schema.setConfig(dialectId, "baseToken", "$id");
-Schema.add({
-  "$id": dialectId,
-  "$schema": dialectId
-});
 
 describe("Schema.get with files", () => {
   Given("a schema loaded from a file as the context schema", () => {

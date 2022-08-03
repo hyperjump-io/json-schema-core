@@ -12,10 +12,6 @@ describe("Combined anchor and id", () => {
     Schema.setConfig(dialectId, "baseToken", "$id");
     Schema.setConfig(dialectId, "embeddedToken", "$id");
     Schema.setConfig(dialectId, "anchorToken", "$id");
-    Schema.add({
-      "$id": dialectId,
-      "$schema": dialectId
-    });
   });
 
   Given("A schema with an anchor id", () => {
