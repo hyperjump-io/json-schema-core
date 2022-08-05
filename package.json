@@ -1,6 +1,6 @@
 {
   "name": "@hyperjump/json-schema-core",
-  "version": "0.28.1",
+  "version": "0.28.2",
   "description": "A framework for building JSON Schema tools",
   "main": "lib/index.js",
   "exports": {
