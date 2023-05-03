@@ -1,3 +1,5 @@
+# THIS FUNCTIONALITY HAS BEEN ROLLED INTO [@hyperjump/json-schema](https://github.com/hyperjump-io/json-schema#meta-schemas-keywords-vocabularies-and-dialects-experimental)
+
 # Hyperjump - JSON Schema Core
 JSON Schema Core (JSC) is a framework for building JSON Schema based validators
 and other tools.
